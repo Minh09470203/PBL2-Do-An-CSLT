@@ -1,0 +1,7 @@
+C001|Nguyen Van A|0947122325|Da Nang|a@gmail.com
+C002|Tran Thi B|0912345678|Ha Noi|b@yahoo.com
+C003|Le Van C|0923456789|TP Ho Chi Minh|c@outlook.com
+C004|Pham Thi D|0934567890|Can Tho|d@gmail.com
+C005|Hoang Van E|0945678901|Hue|e@gmail.com
+C006|Nguyen Duc Minh|0822770286|Quang Tri|10a10nguyenducminh@gmail.com
+C007|Nguyen Huy Hoang|0832122042|Nghe An|Hoang@gmail.com

@@ -1,0 +1,5 @@
+S001|Nguyen Van Quan|Manager|0901234567  
+S002|Tran Thi Nhan|Sales Staff|0912345678  
+S003|Le Van Kho|Warehouse Staff|0923456789  
+S004|Pham Thi Thu|Cashier|0934567890  
+S005|Hoang Van Ban|Sales Staff|0945678901S006|Nguyen Manh Cuong|Sales Staff|0947122032

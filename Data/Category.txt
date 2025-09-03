@@ -1,0 +1,15 @@
+CAT01|Sneaker
+CAT02|Running
+CAT03|Boot
+CAT04|Sandals
+CAT05|Loafer
+CAT06|High Heel
+CAT07|Slip-On
+CAT08|Casual
+CAT09|Formal
+CAT10|Basketball
+CAT11|Training
+CAT12|Skate
+CAT13|Hiking
+CAT14|Oxford
+CAT15|Derby
