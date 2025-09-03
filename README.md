@@ -74,23 +74,23 @@ A comprehensive C++ console-based application for managing a shoe store business
 ### Method 1: Using GCC (Recommended)
 
 1. **Clone the repository:**
-   ```bash
+   ```
    git clone https://github.com/yourusername/shoe-store-management.git
    cd shoe-store-management
    ```
 
 2. **Compile the application:**
-   ```bash
+   ```
    g++ -std=c++11 -o shoe_store main.cpp
    ```
 
 3. **Create the Data directory:**
-   ```bash
+   ```
    mkdir Data
    ```
 
 4. **Run the application:**
-   ```bash
+   ```
    ./shoe_store
    ```
 
@@ -192,19 +192,6 @@ Data/
 - **Username**: `CUS001` | **Password**: `123456`
 - **Username**: `CUS002` | **Password**: `123456`
 - **Username**: `CUS003` | **Password**: `123456`
-
-### Performance Notes
-
-- The application loads all data into memory at startup
-- Large datasets may require additional RAM
-- File operations are performed synchronously
-
-### Development Guidelines
-
-- Follow existing code style and naming conventions
-- Add comments for complex logic
-- Test all new features thoroughly
-- Update documentation as needed
 
 ## License
 
