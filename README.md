@@ -1,8 +1,8 @@
-# Shoe Store Management System 👟
+# Shoe Store Management Application 👟
 
 A comprehensive C++ console-based application for managing a shoe store business with role-based access control for administrators, staff, and customers.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [System Requirements](#system-requirements)
@@ -12,9 +12,9 @@ A comprehensive C++ console-based application for managing a shoe store business
 - [Default Accounts](#default-accounts)
 - [License](#license)
 
-## ✨ Features
+## Features
 
-### 🔐 Authentication System
+### Authentication System
 - **Role-based access control** with three user types:
   - **Admin**: Full system access
   - **Staff**: Limited management capabilities
@@ -22,7 +22,7 @@ A comprehensive C++ console-based application for managing a shoe store business
 - **Secure login** with username/password authentication
 - **Password change** functionality for all users
 
-### 👥 User Management
+### User Management
 - **Customer Management**
   - Add new customers
   - View customer list
@@ -33,7 +33,7 @@ A comprehensive C++ console-based application for managing a shoe store business
   - View staff list
   - Delete staff accounts
 
-### 📦 Product Management
+### Product Management
 - **Comprehensive Product Catalog**
   - Add new products with details (ID, name, color, size, price, quantity)
   - View all products in formatted table
@@ -41,7 +41,7 @@ A comprehensive C++ console-based application for managing a shoe store business
   - Delete products from inventory
   - Category and supplier association
 
-### 🏷️ Category & Supplier Management
+### Category & Supplier Management
 - **Category Management**
   - View all product categories
   - Add new categories
@@ -49,7 +49,7 @@ A comprehensive C++ console-based application for managing a shoe store business
   - View all suppliers
   - Add new suppliers
 
-### 🧾 Invoice System
+### Invoice System
 - **Complete Sales Management**
   - Create new invoices with multiple products
   - Automatic inventory deduction
@@ -57,19 +57,19 @@ A comprehensive C++ console-based application for managing a shoe store business
   - View invoice details
   - Filter invoices by staff or customer
 
-### 📊 Statistics & Reporting
+### Statistics & Reporting
 - View comprehensive business statistics
 - Total customers, staff, products, and invoices
 - Total revenue calculation
 
-## 🖥️ System Requirements
+## System Requirements
 
 - **Operating System**: Windows, Linux, or macOS
 - **Compiler**: C++11 compatible compiler (GCC, Clang, MSVC)
 - **RAM**: Minimum 512MB
 - **Storage**: 50MB free space
 
-## 🚀 Installation
+## Installation
 
 ### Method 1: Using GCC (Recommended)
 
@@ -111,7 +111,7 @@ A comprehensive C++ console-based application for managing a shoe store business
 5. Build and run
 6. Create the `Data/` directory in the output folder
 
-## 📖 Usage
+## Usage
 
 ### Initial Setup
 
@@ -152,7 +152,7 @@ The application starts with a login screen. Use one of the [default accounts](#d
 4. View personal purchase history
 5. Update personal information
 
-## 🗂️ Data Structure
+## Data Structure
 
 ### Custom Data Structures
 
@@ -176,7 +176,7 @@ Data/
 └── Invoice.txt      # Sales invoices with details
 ```
 
-## 🔑 Default Accounts
+## Default Accounts
 
 ### Administrator Account
 - **Username**: `admin`
@@ -206,6 +206,6 @@ Data/
 - Test all new features thoroughly
 - Update documentation as needed
 
-## 📝 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
