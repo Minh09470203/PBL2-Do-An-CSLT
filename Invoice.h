@@ -100,11 +100,10 @@ void CreateInvoice(MyVector<Invoice*>& invoices,
         return;
     }
 
-    // Tao doi tuong hoa don
+    // Create Invoice object
     Invoice* inv = new Invoice();
     inv->setInfo(invID, date, cust, staff);
 
-    // Nhap chi tiet don hang
     int itemCount;
     cout << "Enter number of products in invoice: ";
     cin >> itemCount;
@@ -201,20 +200,11 @@ void printInvoiceList(MyVector<Invoice*> &invoices) {
          << setw(12) << "Total Amount" << endl;
     cout << string(82, '-') << endl;
     for (int i = 0; i < invoices.getSize(); i++) {
-        Invoice* inv = invoices[i];
         cout << left << setw(15) << invoices[i]->getIDhd()
              << setw(12) << invoices[i]->getDate()
              << setw(18) << invoices[i]->getCustomer()->getName()
              << setw(18) << invoices[i]->getStaff()->getNamenv()
              << setw(12) << invoices[i]->getTotalAmount() << "VND" << endl;
-        MyVector<OrderDetail*> details = inv->getDetails();
-        cout << "Order detail:" << endl;
-        for (int j = 0; j < details.getSize(); j++) {
-            OrderDetail* od = details[j];
-            cout << "-" << od->getProduct()->getIDsp() << "|"
-                 << od->getQuantity() << "|"
-                 << od->getUnitPrice() << endl;
-        }
         cout << string(82, '-') << endl;
     }
 }
