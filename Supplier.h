@@ -27,7 +27,7 @@ class MyMap {
         }
     }
 
-    // Seatch node function
+    // Search node function
     V* Find(Node* node, K key) {
         if (!node) return nullptr;
         if (key == node->key) return &node->value;
