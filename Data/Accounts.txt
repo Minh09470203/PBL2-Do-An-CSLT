@@ -1,7 +1,0 @@
-admin|admin0123|admin|ADMIN001
-NV001|staff123|staff|S001
-NV002|staff123|staff|S002
-NV003|staff123|staff|S003
-CUS001|123456|customer|C001
-CUS002|123456|customer|C002
-CUS003|123456|customer|C003
