@@ -20,7 +20,7 @@ Data is stored and loaded from text files in the `DataFile/` directory.
 
 ---
 
-## Project structure (overview)
+## Project structure 
 - `main.cpp` — entry point, main menu
 - `Models/` — object classes (Customer, Staff, Product, Invoice, ...)
 - `DAO/` — Data Access Objects, responsible for file IO
@@ -56,7 +56,7 @@ The program will load data from the `DataFile/` folder (text files). If a file i
 
 ---
 
-## Short usage guide (flow)
+## Short usage guide
 1. Run the program → main menu
 2. Choose `1. Login` → enter `username` and `password`
 3. If logged in as Staff:
