@@ -69,3 +69,11 @@ int Login(CustomerDAO &customerDAO, StaffDAO &staffDAO, AccountDAO &accountDAO) 
     cout << "Invalid username or password!\n";
     return 0; // Login failed
 }
+
+ostream &Account::output(ostream &os) const {
+    os << left << setw(15) << username << setw(15) << userType << setw(15) << userID;
+    return os;
+}
+ostream &operator<<(ostream &os, const Account &a) {
+    return a.output(os);
+}

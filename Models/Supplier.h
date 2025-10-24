@@ -23,6 +23,11 @@ class Supplier {
         string getSupName();
         void setSupID(string SupID);
         void setSupName(string SupName);
+    // Stream I/O
+    ostream& output(ostream& os) const;
+    istream& input(istream& is);
+        friend ostream& operator<<(ostream& os, const Supplier& s);
+        friend istream& operator>>(istream& is, Supplier& s);
 };
 
 // Declarations; implementations are in Supplier.cpp

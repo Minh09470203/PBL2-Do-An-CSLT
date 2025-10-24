@@ -37,7 +37,7 @@ void Invoice::PrintHD() {
          << "\nCustomer: " << kh->getName() << "\nStaff: " << nv->getNamenv()
          << "\n--- Order detail ---\n";
     for(int i = 0; i < details.getSize(); i++) {
-        details[i]->display();
+        cout << *details[i] << endl;
     }
     cout << "Total amount: " << TotalAmount << " VND" << endl;
 }

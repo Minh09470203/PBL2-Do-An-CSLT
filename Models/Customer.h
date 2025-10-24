@@ -1,6 +1,7 @@
 #ifndef CUSTOMER_H_INCLUDED
 #define CUSTOMER_H_INCLUDED
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <iomanip>
 #include <sstream>
@@ -25,11 +26,8 @@ public:
     : Person(ID_KH, Name_KH, SDT), Address(Address), Email(Email) {}
 
     // Override virtual methods for polymorphism
-    void display() const override;
-
-    // Keep existing method for compatibility
-    void PrintKH();
-
+    ostream& output(ostream& os) const override;
+    istream& input(istream& is) override;
     string getAddress();
     string getEmail();
     void setEmail(string newEmail);

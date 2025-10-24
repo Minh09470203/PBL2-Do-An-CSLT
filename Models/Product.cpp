@@ -11,16 +11,34 @@
 using namespace std;
 
 // Product member definitions
-void Product::XuatSP() {
-    cout << left << setw(8)  << ID_SP
-         << setw(20) << Shoe_Name
-         << setw(6)  << Size
-         << setw(12) << Price
-         << setw(8)  << Color
-         << setw(18) << SLT
-         << setw(15) << (cate ? cate->getName_Category() : "N/A")
-         << setw(15) << (sup ? sup->getSupName() : "N/A") << endl;
+
+// Stream operators
+ostream& Product::output(ostream& os) const {
+    os << left << setw(8)  << ID_SP
+       << setw(20) << Shoe_Name
+       << setw(6)  << Size
+       << setw(12) << Price
+       << setw(8) << Color
+       << setw(18) << SLT
+       << setw(15) << (cate ? cate->getName_Category() : string("N/A"))
+       << setw(15) << (sup ? sup->getSupName() : string("N/A"));
+    return os;
 }
+
+ostream& operator<<(ostream& os, const Product& p) {
+    return p.output(os);
+}
+istream& Product::input(istream& is) {
+    cout << "Enter ID: "; getline(is, ID_SP);
+    cout << "Enter shoe name: "; getline(is, Shoe_Name);
+    cout << "Enter color: "; getline(is, Color);
+    cout << "Enter size: "; is >> Size; is.ignore();
+    cout << "Enter price: "; is >> Price; is.ignore();
+    cout << "Enter stock quantity: "; is >> SLT; is.ignore();
+    return is;
+}
+
+istream& operator>>(istream& is, Product& p) { return p.input(is); }
 
 string Product::getIDsp() { return ID_SP; }
 string Product::getNamesp() { return Shoe_Name; }
@@ -39,6 +57,14 @@ void Product::setCategory(Category* newCate) { this->cate = newCate; }
 // Free functions 
 void printProductList(ProductDAO &productDAO) {
     MyVector<Product*>& sp = productDAO.getDataCache();
+    printHeader();
+    for(int i = 0; i < sp.getSize(); i++) {
+        cout << *sp[i] << endl;
+    }
+    cout << string(95, '-') << endl;
+}
+
+void printHeader() {
     cout << left << setw(8)  << "ID"
          << setw(20) << "Shoe Name"
          << setw(6)  << "Size"
@@ -47,10 +73,6 @@ void printProductList(ProductDAO &productDAO) {
          << setw(18) << "Stock Quantity"
          << setw(15) << "Category"
          << setw(15) << "Supplier" << endl;
-    cout << string(95, '-') << endl;
-    for(int i = 0; i < sp.getSize(); i++) {
-        sp[i]->XuatSP();
-    }
     cout << string(95, '-') << endl;
 }
 
@@ -125,14 +147,43 @@ void ProductInsert(ProductDAO &productDAO, SupplierDAO &supplierDAO, CategoryDAO
     }
 }
 
-Product* ProductSearchByID(ProductDAO &productDAO, string ma) {
+Product* ProductSearchByIDName(ProductDAO &productDAO, string key) {
     MyVector<Product*>& sp = productDAO.getDataCache();
     for (int i = 0; i < sp.getSize(); i++) {
-        if (sp[i]->getIDsp() == ma) {
+        if (sp[i]->getIDsp() == key || sp[i]->getNamesp() == key) {
             return sp[i];
         }
     }
     return nullptr;
+}
+
+void SearchProductByPriceRange(ProductDAO &productDAO) {
+    MyVector<Product*>& sp = productDAO.getDataCache();
+    MyVector<Product*> results;
+
+    unsigned int minPrice, maxPrice;
+    cout << "Enter minimum price: ";
+    cin >> minPrice;
+    cout << "Enter maximum price: ";
+    cin >> maxPrice;
+    cin.ignore();
+
+    for (int i = 0; i < sp.getSize(); i++) {
+        int price = sp[i]->getPrice();
+        if (price >= minPrice && price <= maxPrice) {
+            results.Push_back(sp[i]);
+        }
+    }
+
+    if (results.Empty()) {
+        cout << "No products found in the given price range." << endl;
+    } else {
+        cout << "Products found in the given price range:" << endl;
+        printHeader();
+        for (int i = 0; i < results.getSize(); i++) {
+            cout << *results[i] << endl;
+        }
+    }
 }
 
 void ProductDelete(ProductDAO &productDAO) {

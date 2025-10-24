@@ -24,9 +24,8 @@ public:
     : Person(ID_NV, Name_NV, SDT), Position(Position) {}
 
     // Override virtual methods for polymorphism
-    void display() const override;
-
-    void PrintNV();
+    ostream& output(ostream& os) const override;
+    istream& input(istream& is) override;
 
     string getIDnv();
     string getNamenv();

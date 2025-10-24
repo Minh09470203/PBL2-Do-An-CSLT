@@ -1,16 +1,28 @@
 #include "Customer.h"
 #include "../DAO/CustomerDAO.h"
 // Customer member definitions 
-void Customer::display() const {
-    cout << left << setw(8) << ID
-         << setw(20) << Name
-         << setw(20) << Phone
-         << setw(15) << Address
-         << setw(25) << Email << endl;
+using namespace std; 
+ostream& Customer::output(ostream& os) const {
+    os << left << setw(8) << ID
+       << setw(20) << Name
+       << setw(20) << Phone
+       << setw(15) << Address
+       << setw(25) << Email;
+    return os;
 }
 
-void Customer::PrintKH() {
-    display();
+istream& Customer::input(istream& is) {
+    cout << "Enter ID: ";
+    getline(is, ID);
+    cout << "Enter name: ";
+    getline(is, Name);
+    cout << "Enter phone number: ";
+    getline(is, Phone);
+    cout << "Enter address: ";
+    getline(is, Address);
+    cout << "Enter email: ";
+    getline(is, Email);
+    return is;
 }
 
 string Customer::getAddress() { return Address; }
@@ -21,6 +33,10 @@ void Customer::setAddress(string newAddress) { this->Address = newAddress; }
 // Free functions implementations moved from header
 void printCustomerList(CustomerDAO &customerDAO) {
     MyVector<Customer*>& cus = customerDAO.getDataCache();
+    if (cus.Empty()) {
+        cout << "Customer list is empty." << endl;
+        return;
+    }
     cout << left << setw(8) << "ID"
          << setw(20) << "Name"
          << setw(20) << "Phone number"
@@ -28,7 +44,8 @@ void printCustomerList(CustomerDAO &customerDAO) {
          << setw(25) << "Email" << endl;
     cout << string(83, '-') << endl;
     for (int i = 0; i < cus.getSize(); i++) {
-        cus[i]->PrintKH();
+        cout << *cus[i];
+        cout << endl;
     }
     cout << string(83, '-') << endl;
 }
@@ -47,20 +64,16 @@ void CustomerInsert(CustomerDAO &customerDAO) {
     cin >> n;
     cin.ignore(); 
     for(int i = 0; i < n; i++) {
-        string ID_KH, Name_KH, SDT, Address, Email;
-        cout << "Enter ID: "; getline(cin, ID_KH);
-        if (isduplicateCustomer(customerDAO, ID_KH)) {
+        Customer *kh = new Customer();
+        cin >> *kh;
+        if (isduplicateCustomer(customerDAO, kh->getID())) {
             cout << "The customer ID already exists. Please enter again." << endl;
+            delete kh; // Cleanup
             --i;
             continue;
         }
-        cout << "Enter name: "; getline(cin, Name_KH);
-        cout << "Enter phone number: "; getline(cin, SDT);
-        cout << "Enter address: "; getline(cin, Address);
-        cout << "Enter email: "; getline(cin, Email);
-
-        Customer *kh = new Customer(ID_KH, Name_KH, SDT, Address, Email);
-        if (customerDAO.create(ID_KH, kh)) {
+        
+        if (customerDAO.create(kh->getID(), kh)) {
             cout << "Customer added successfully." << endl;
         } else {
             cout << "Failed to add customer." << endl;
@@ -68,12 +81,11 @@ void CustomerInsert(CustomerDAO &customerDAO) {
             --i;
         }
     }
-    cout << "Customer added successfully." << endl;
 }
 
 void CustomerEdit(Customer* currentUser, CustomerDAO &customerDAO) {
     cout << "---Current personal information---" << endl;
-    currentUser->PrintKH();
+    cout << *currentUser << endl;
 
     string newName, newPhone, newEmail;
     cout << "Enter new name (or press Enter to keep current): ";
@@ -104,7 +116,7 @@ void CustomerEdit(Customer* currentUser, CustomerDAO &customerDAO) {
         if (!newEmail.empty()) currentUser->setEmail(newEmail);
 
         cout << "\nUpdate successful." << endl;
-        currentUser->PrintKH();
+        cout << *currentUser << endl;
         MyVector<Customer*>& cus = customerDAO.getDataCache();
         // Rewrite entire Customer.txt file
         customerDAO.saveAll();
@@ -130,7 +142,6 @@ void CustomerSearch(CustomerDAO &customerDAO) {
         if (cus[i]->getName() == keyword || cus[i]->getPhone() == keyword) {
             if (!found) {
                 cout << "Search results:" << endl;
-                cout << "Search results:" << endl;
                 cout << left << setw(8) << "ID"
                      << setw(20) << "Name"
                      << setw(20) << "Phone number"
@@ -139,7 +150,7 @@ void CustomerSearch(CustomerDAO &customerDAO) {
                 cout << string(83, '-') << endl;
                 found = true;
             }
-            cus[i]->PrintKH();
+            cout << *cus[i] << endl;
         }
     }
 

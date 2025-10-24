@@ -1,5 +1,6 @@
 #ifndef PERSON_H_INCLUDED
 #define PERSON_H_INCLUDED
+#include <iostream>
 #include <string>
 #include "../DataStructure/MyVector.h"
 using namespace std;
@@ -14,7 +15,7 @@ public:
     Person(string id = "", string name = "", string phone = "");
 
     virtual ~Person();
-    virtual void display() const = 0;
+    
 
     string getID() const;
     string getName() const;
@@ -23,6 +24,10 @@ public:
     void setID(string id);
     void setName(string name);
     void setPhone(string phone);
+    virtual ostream& output(ostream& os) const = 0;
+    friend ostream& operator<<(ostream& os, const Person& person);
+    virtual istream& input(istream& is) = 0;
+    friend istream& operator>>(istream& is, Person& person);
 };
 
 #endif // PERSON_H_INCLUDED

@@ -14,9 +14,10 @@ public:
     string password;
     string userType; // "staff", "customer"
     string userID;   // ID user
+    // Stream I/O
+    ostream& output(ostream& os) const;
+    friend ostream& operator<<(ostream& os, const Account& a);
 };
-
-// Declarations free functions
 // Forward declare DAOs used in function prototypes
 class AccountDAO;
 class CustomerDAO;

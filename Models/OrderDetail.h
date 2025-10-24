@@ -1,7 +1,7 @@
 #ifndef ORDERDETAIL_H_INCLUDED
 #define ORDERDETAIL_H_INCLUDED
+#include <iostream>
 #include "Product.h"
-
 class OrderDetail {
     private:
         Product *SP;
@@ -15,23 +15,13 @@ class OrderDetail {
         )
         : SP(SP), Quantity(Quantity), UnitPrice(UnitPrice) {}
 
-        unsigned long Subtotal() const {
-            return Quantity * UnitPrice;
-        }
-        unsigned int getQuantity() const {
-            return Quantity;
-        }
-        unsigned long getUnitPrice() const {
-            return UnitPrice;
-        }
-        Product *getProduct() const {
-            return SP;
-        }
-        void display() const {
-            cout << SP->getNamesp() << " | Quantity: " << Quantity
-                 << " | Unit price: " << UnitPrice
-                 << " | Subtotal: " << Subtotal() << endl;
-        }
+        unsigned long Subtotal() const;
+        unsigned int getQuantity() const;
+        unsigned long getUnitPrice() const;
+        Product *getProduct() const;
+        // Stream I/O
+        ostream& output(ostream& os) const;
+        friend ostream& operator<<(ostream& os, const OrderDetail& od);
 };
 
 #endif // ORDERDETAIL_H_INCLUDED

@@ -41,8 +41,6 @@ public:
         delete sup;
         delete cate;
     }
-    
-    void XuatSP();
 
     string getIDsp();
     string getNamesp();
@@ -57,12 +55,19 @@ public:
     void setColor(string newColor);
     void setSupplier(Supplier* newSup);
     void setCategory(Category* newCate);
+    // Stream I/O helpers
+    ostream& output(ostream& os) const;
+    istream& input(istream& is);
+    friend ostream& operator<<(ostream& os, const Product& p);
+    friend istream& operator>>(istream& is, Product& p);
 };
 
-// Declarations for product-related functions (implemented in Product.cpp)
+// Declarations for product-related functions 
 void printProductList(ProductDAO &productDAO);
+void printHeader();
 bool isDuplicateProduct(ProductDAO &productDAO, const string& id = "", const string& name = "");
 void ProductInsert(ProductDAO &productDAO, SupplierDAO &supplierDAO, CategoryDAO &categoryDAO);
-Product* ProductSearchByID(ProductDAO &productDAO, string ma);
+Product* ProductSearchByIDName(ProductDAO &productDAO, string key);
+void SearchProductByPriceRange(ProductDAO &productDAO);
 void ProductDelete(ProductDAO &productDAO);
 #endif // PRODUCT_H_INCLUDED

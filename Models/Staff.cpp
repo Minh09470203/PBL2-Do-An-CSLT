@@ -7,15 +7,24 @@
 using namespace std;
 
 // Staff member definitions
-void Staff::display() const {
-    cout << left << setw(8) << ID
-         << setw(20) << Name
-         << setw(25) << Position
-         << setw(20) << Phone << endl;
+ostream& Staff::output(ostream& os) const {
+    os << left << setw(8) << ID
+       << setw(20) << Name
+       << setw(25) << Position
+       << setw(20) << Phone;
+    return os;
 }
 
-void Staff::PrintNV() {
-    display();
+istream& Staff::input(istream& is) {
+    cout << "Enter ID: ";
+    getline(is, ID);
+    cout << "Enter name: ";
+    getline(is, Name);
+    cout << "Enter position: ";
+    getline(is, Position);
+    cout << "Enter phone number: ";
+    getline(is, Phone);
+    return is;
 }
 
 string Staff::getIDnv() { return ID; }
@@ -26,13 +35,17 @@ void Staff::setPosition(string newPosition) { this->Position = newPosition; }
 
 void printStaffList(StaffDAO &staffDAO) {
     MyVector<Staff*>& sta = staffDAO.getDataCache();
+    if (sta.Empty()) {
+        cout << "Staff list is empty." << endl;
+        return;
+    }
     cout << left << setw(8) << "ID"
          << setw(20) << "Name"
          << setw(25) << "Position"
          << setw(20) << "Phone number" << endl;
     cout << string(73, '-') << endl;
     for (int i = 0; i < sta.getSize(); i++) {
-        sta[i]->PrintNV();
+        cout << *sta[i] << endl;
     }
     cout << string(73, '-') << endl;
 }
@@ -52,22 +65,21 @@ void StaffInsert(StaffDAO &staffDAO) {
     cin >> n;
     cin.ignore();  
     for(int i = 0; i < n; i++) {
-        string ID_NV, Name_NV, Position, SDT;
-        cout << "Enter ID: "; getline(cin, ID_NV);
-        if (isduplicateStaff(staffDAO, ID_NV)) {
+        Staff *nv = new Staff();
+        cin >> *nv;
+        if (isduplicateStaff(staffDAO, nv->getIDnv())) {
             cout << "The staff ID already exists. Please enter again." << endl;
+            delete nv; // Cleanup
             --i;
             continue;
         }
-        cout << "Enter name: "; getline(cin, Name_NV);
-        cout << "Enter position: "; getline(cin, Position);
-        cout << "Enter phone number: "; getline(cin, SDT);
 
-        Staff *nv = new Staff(ID_NV, Name_NV, Position, SDT);
-        if (staffDAO.create(ID_NV, nv)) {
+        if (staffDAO.create(nv->getIDnv(), nv)) {
             cout << "Staff added successfully." << endl;
         } else {
             cout << "Failed to add staff." << endl;
+            delete nv;  // Cleanup nếu fail
+            --i;
         }
     }
 }
