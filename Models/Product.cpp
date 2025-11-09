@@ -126,15 +126,21 @@ void ProductInsert(ProductDAO &productDAO, SupplierDAO &supplierDAO, CategoryDAO
         cout << "Enter CateID: "; getline(cin, CateID);
         cout << "Enter SupID: "; getline(cin, SupID);
 
-        Category *cate = new Category();
-        cate->setID_Category(CateID);
-        string* cateName = categoryDAO.read(CateID);
-        cate->setName_Category(cateName ? *cateName : "Unknown Category");
+    Category *cate = new Category();
+    cate->setID_Category(CateID);
+    Category* cateFromDao = categoryDAO.read(CateID);
+    cate->setName_Category(cateFromDao ? cateFromDao->getName_Category() : "Unknown Category");
 
-        Supplier *sup = new Supplier();
-        sup->setSupID(SupID);
-        string* supName = supplierDAO.read(SupID);
-        sup->setSupName(supName ? *supName : "Unknown Supplier");
+        // create a product-local Supplier copy from DAO (so Product destructor can still delete it)
+        Supplier *sup = nullptr;
+        Supplier *supFromDao = supplierDAO.read(SupID);
+        if (supFromDao) {
+            sup = new Supplier(supFromDao->getSupID(), supFromDao->getSupName(), supFromDao->getAddress(), supFromDao->getEmail());
+        } else {
+            sup = new Supplier();
+            sup->setSupID(SupID);
+            sup->setSupName("Unknown Supplier");
+        }
 
         Product *p = new Product(masp, tensp, color, shoeSize, gia, soluongton, sup, cate);
         if (productDAO.create(masp, p)) {

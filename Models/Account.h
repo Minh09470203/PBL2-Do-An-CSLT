@@ -25,5 +25,6 @@ class StaffDAO;
 
 void ChangePassword(AccountDAO &accountDAO);
 int Login(CustomerDAO &customerDAO, StaffDAO &staffDAO, AccountDAO &accountDAO);
+void Register(CustomerDAO &customerDAO, AccountDAO &accountDAO);
 
 #endif // ACCOUNT_H_INCLUDED

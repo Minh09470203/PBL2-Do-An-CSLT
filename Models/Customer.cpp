@@ -118,8 +118,8 @@ void CustomerEdit(Customer* currentUser, CustomerDAO &customerDAO) {
         cout << "\nUpdate successful." << endl;
         cout << *currentUser << endl;
         MyVector<Customer*>& cus = customerDAO.getDataCache();
-        // Rewrite entire Customer.txt file
-        customerDAO.saveAll();
+    // Rewrite entire Customer.txt file
+    customerDAO.saveData();
         cout << "Your information has been saved." << endl;
     } else {
         cout << "\nUpdate canceled. Information unchanged." << endl;

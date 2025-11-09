@@ -26,7 +26,7 @@ Account* AccountDAO::read(const string &id) {
 }
 
 bool AccountDAO::update(const string &id, Account* entity) {
-    return saveAll();
+    return saveData();
 }
 
 bool AccountDAO::remove(const string &id) {
@@ -35,13 +35,13 @@ bool AccountDAO::remove(const string &id) {
             delete dataCache[i];
             for (int j = i; j < dataCache.getSize() - 1; ++j) dataCache[j] = dataCache[j+1];
             dataCache.Pop_back();
-            return saveAll();
+            return saveData();
         }
     }
     return true;
 }
 
-bool AccountDAO::loadAll() {
+bool AccountDAO::loadData() {
     ifstream file(filename);
     if (!file.is_open()) {
         cout << "Cannot open file " << filename << endl;
@@ -66,8 +66,7 @@ bool AccountDAO::loadAll() {
     file.close();
     return true;
 }
-
-bool AccountDAO::saveAll() {
+bool AccountDAO::saveData() {
     ofstream file(filename);
     if (!file.is_open()) {
         cout << "Cannot open " << filename << endl;

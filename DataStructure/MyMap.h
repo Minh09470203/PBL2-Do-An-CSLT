@@ -18,12 +18,12 @@ class MyMap {
     };
 
     Node* root;
-    int size;  // ← THÊM: Đếm số lượng nodes
+    int size;  // Count nodes
 
     void Insert(Node*& node, K key, V value) {
         if (!node) {
             node = new Node{key, value, nullptr, nullptr};
-            size++;  // ← Tăng size
+            size++;  
         } else if (key < node->key) {
             Insert(node->left, key, value);
         } else if (key > node->key) {
@@ -47,7 +47,7 @@ class MyMap {
         delete node;
     }
     
-    // ← THÊM: Traverse với callback (cho DAO)
+    // Traverse với callback (cho DAO)
     void Traverse(Node* node, void (*callback)(const K&, const V&)) {
         if (!node) return;
         Traverse(node->left, callback);
@@ -55,7 +55,7 @@ class MyMap {
         Traverse(node->right, callback);
     }
     
-    // ← THÊM: Traverse với ofstream (ghi file)
+    // Traverse với ofstream (ghi file)
     void TraverseToFile(Node* node, ofstream& file) {
         if (!node) return;
         TraverseToFile(node->left, file);
@@ -63,7 +63,7 @@ class MyMap {
         TraverseToFile(node->right, file);
     }
 
-    // ← THÊM: Remove method (xóa node)
+    // Remove method (xóa node)
     Node* Remove(Node* node, K key, bool& removed) {
         if (!node) {
             removed = false;
@@ -123,7 +123,7 @@ public:
         return Find(root, key);
     }
     
-    // ← THÊM: Public Remove method
+    // Public Remove method
     bool Remove(K key) {
         bool removed = false;
         root = Remove(root, key, removed);
@@ -140,11 +140,11 @@ public:
         }
     }
     
-    // ← THÊM: Traverse display
+    // Traverse display
     void Traverse(Node* node) {
-        if (!node) return;
+        if (!node) return;  
         Traverse(node->left);
-        cout << setw(10) << node->key << "|  " 
+        cout << setw(10) << node->key << "|  "
              << setw(20) << node->value << endl;
         Traverse(node->right);
     }
@@ -153,29 +153,27 @@ public:
         Traverse(root);
     }
     
-    // ← THÊM: Count
+    
     int Count() const {
         return size;
     }
     
-    // ← THÊM: Clear
+    
     void Clear() {
         destroy(root);
         root = nullptr;
         size = 0;
     }
     
-    // ← THÊM: Traverse với callback (public)
+   
     void ForEach(void (*callback)(const K&, const V&)) {
         Traverse(root, callback);
     }
     
-    // ← THÊM: Write to file
     void WriteToFile(ofstream& file) {
         TraverseToFile(root, file);
     }
     
-    // ← THÊM: isEmpty
     bool Empty() const {
         return size == 0;
     }

@@ -23,9 +23,11 @@ void AddCategory(CategoryDAO &categoryDAO) {
         return;
     }
 
-    if (categoryDAO.addCategory(newCategory.getID_Category(), newCategory.getName_Category())) {
+    Category* p = new Category(newCategory.getID_Category(), newCategory.getName_Category());
+    if (categoryDAO.create(p->getID_Category(), p)) {
         cout << "Category added successfully.\n";
     } else {
+        delete p;
         cout << "Failed to add category.\n";
     }
 

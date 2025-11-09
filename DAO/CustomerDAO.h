@@ -11,8 +11,8 @@ public:
     Customer* read(const string &id) override;
     bool update(const string &id, Customer* entity) override;
     bool remove(const string &id) override;
-    bool loadAll() override;
-    bool saveAll() override;
+    bool loadData() override;
+    bool saveData() override;
 };
 
 #endif // CUSTOMERDAO_H_INCLUDED

@@ -43,13 +43,13 @@ bool ProductDAO::remove(const string &id) {
                 dataCache[j] = dataCache[j + 1];
             }
             dataCache.Pop_back();
-            return saveAll();
+            return saveData();
         }
     }
     return true;
 }
 
-bool ProductDAO::loadAll(SupplierDAO &supplierDAO, CategoryDAO &categoryDAO) {
+bool ProductDAO::loadData(SupplierDAO &supplierDAO, CategoryDAO &categoryDAO) {
     ifstream file(filename);
     if (!file.is_open()) {
         cout << "Cannot open file " << filename << endl;
@@ -70,15 +70,21 @@ bool ProductDAO::loadAll(SupplierDAO &supplierDAO, CategoryDAO &categoryDAO) {
         getline(ss, supID, '|');
         getline(ss, cateID);
 
-        Supplier *sup = new Supplier();
-        sup->setSupID(supID);
-        string* supName = supplierDAO.read(supID);
-        sup->setSupName(supName ? *supName : "Unknown Supplier");
+        // Build a product-local Supplier copy from DAO (preserve existing ownership semantics)
+        Supplier *sup = nullptr;
+        Supplier *supFromDao = supplierDAO.read(supID);
+        if (supFromDao) {
+            sup = new Supplier(supFromDao->getSupID(), supFromDao->getSupName(), supFromDao->getAddress(), supFromDao->getEmail());
+        } else {
+            sup = new Supplier();
+            sup->setSupID(supID);
+            sup->setSupName("Unknown Supplier");
+        }
 
         Category *cate = new Category();
         cate->setID_Category(cateID);
-        string* cateName = categoryDAO.read(cateID);
-        cate->setName_Category(cateName ? *cateName : "Unknown Category");
+        Category* cateFromDao = categoryDAO.read(cateID);
+        cate->setName_Category(cateFromDao ? cateFromDao->getName_Category() : "Unknown Category");
 
         Product *p = new Product(id, name, color, stoi(sizeStr), stoul(priceStr), stoi(qtyStr), sup, cate);
         dataCache.Push_back(p);
@@ -87,12 +93,12 @@ bool ProductDAO::loadAll(SupplierDAO &supplierDAO, CategoryDAO &categoryDAO) {
     return true;
 }
 
-bool ProductDAO::loadAll() {
+bool ProductDAO::loadData() {
     // Not used but required by IDAO
     return true;
 }
 
-bool ProductDAO::saveAll() {
+bool ProductDAO::saveData() {
     ofstream file(filename);
     if (!file.is_open()) {
         cout << "Cannot open " << filename << endl;

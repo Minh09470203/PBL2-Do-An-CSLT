@@ -4,26 +4,18 @@
 #include "../DataStructure/MyMap.h"
 #include "../Models/Supplier.h"
 
-class SupplierDAO : public MapDAO {
+class SupplierDAO : public MapDAO<Supplier> {
 public:
-    SupplierDAO(const string& file) : MapDAO(file) {}
+    SupplierDAO(const string& file) : MapDAO<Supplier>(file) {}
+    ~SupplierDAO();
 
-    // Get supplier name by ID
-    string getSupplierName(const string& id);
-
-    // Add supplier (wrapper cho create)
-    bool addSupplier(const string& id, const string& name);
-
-    // Update supplier name
-    bool updateSupplier(const string& id, const string& newName);
-
-    // Delete supplier
-    bool deleteSupplier(const string& id);
-
-    // Check if supplier exists
-    bool supplierExists(const string& id);
-
-    // Display
+    // CRUD operating on Supplier*
+    bool create(const string& id, Supplier* entity) override;
+    Supplier* read(const string& id) override;
+    bool update(const string& id, Supplier* entity) override;
+    bool remove(const string& id) override;
+    bool loadData() override;
+    bool saveData() override;
     void displayAll();
 };
 

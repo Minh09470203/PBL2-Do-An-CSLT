@@ -1,15 +1,15 @@
-SUP01|Nike
-SUP02|Adidas
-SUP03|Converse
-SUP04|Puma
-SUP05|New Balance
-SUP06|Vans
-SUP07|Reebok
-SUP08|Under Armour
-SUP09|ASICS
-SUP10|Fila
-SUP11|Skechers
-SUP12|Jordan
-SUP13|Timberland
-SUP14|Salomon
-SUP15|Mizuno
+SUP01|Nike|Oregon, USA|contact@nike.com
+SUP02|Adidas|Bavaria, Germany|support@adidas.com
+SUP03|Converse|Massachusetts, USA|info@converse.com
+SUP04|Puma|Bavaria, Germany|sales@puma.com
+SUP05|New Balance|Massachusetts, USA|service@newbalance.com
+SUP06|Vans|California, USA|hello@vans.com
+SUP07|Reebok|Massachusetts, USA|contact@reebok.com
+SUP08|Under Armour|Maryland, USA|support@underarmour.com
+SUP09|ASICS|Hyogo, Japan|info@asics.com
+SUP10|Fila|Seoul, Korea|contact@fila.com
+SUP11|Skechers|California, USA|support@skechers.com
+SUP12|Jordan|Oregon, USA|jordan@nike.com
+SUP13|Timberland|New Hampshire, USA|info@timberland.com
+SUP14|Salomon|Annecy, France|contact@salomon.com
+SUP15|Mizuno|Osaka, Japan|support@mizuno.com

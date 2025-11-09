@@ -14,9 +14,9 @@ public:
     Product* read(const string &id) override;
     bool update(const string &id, Product* entity) override;
     bool remove(const string &id) override;
-    bool loadAll(SupplierDAO &supplierDAO, CategoryDAO &categoryDAO);
-    bool loadAll() override; // Not used but required by IDAO
-    bool saveAll() override;
+    bool loadData(SupplierDAO &supplierDAO, CategoryDAO &categoryDAO);
+    bool loadData() override; // Not used but required by IDAO
+    bool saveData() override;
 };
 
 #endif // PRODUCTDAO_H_INCLUDED

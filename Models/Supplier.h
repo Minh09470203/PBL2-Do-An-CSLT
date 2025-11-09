@@ -10,19 +10,23 @@ class Supplier {
         string ID_Supplier;
         string Name_Supplier;
         string Address;
-        string SDT;
+        string Email;
     public:
         Supplier(
                  string ID_Supplier = "",
                  string Name_Supplier = "",
                  string Address = "",
-                 string SDT = ""
+                 string Email = ""
         )
-        : ID_Supplier(ID_Supplier), Name_Supplier(Name_Supplier), Address(Address), SDT(SDT) {}
+        : ID_Supplier(ID_Supplier), Name_Supplier(Name_Supplier), Address(Address), Email(Email) {}
         string getSupID();
         string getSupName();
+    string getAddress();
+    string getEmail();
         void setSupID(string SupID);
         void setSupName(string SupName);
+    void setAddress(string address);
+    void setEmail(string email);
     // Stream I/O
     ostream& output(ostream& os) const;
     istream& input(istream& is);

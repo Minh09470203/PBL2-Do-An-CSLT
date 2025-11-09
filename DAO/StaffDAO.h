@@ -13,8 +13,8 @@ public:
     bool update(const string &id, Staff* entity) override;
     bool remove(const string &id) override;
 
-    bool loadAll() override;
-    bool saveAll() override;
+    bool loadData() override;
+    bool saveData() override;
 };
 
 #endif // STAFFDAO_H_INCLUDED

@@ -13,8 +13,8 @@ public:
     bool update(const string &id, Account* entity) override;
     bool remove(const string &id) override; // username
 
-    bool loadAll() override;
-    bool saveAll() override;
+    bool loadData() override;
+    bool saveData() override;
 };
 
 #endif // ACCOUNTDAO_H_INCLUDED

@@ -20,11 +20,11 @@ class Category {
         string getName_Category();
         void setID_Category(string cateid);
         void setName_Category(string catename);
-            // Stream I/O
-            ostream& output(ostream& os) const;
-            istream& input(istream& is);
-            friend ostream& operator<<(ostream& os, const Category& c);
-            friend istream& operator>>(istream& is, Category& c);
+        // Stream I/O
+        ostream& output(ostream& os) const;
+        istream& input(istream& is);
+        friend ostream& operator<<(ostream& os, const Category& c);
+        friend istream& operator>>(istream& is, Category& c);
 
 };
 

@@ -30,7 +30,7 @@ Customer* CustomerDAO::read(const string &id) {
 }
 
 bool CustomerDAO::update(const string &id, Customer* entity) {
-    return saveAll();
+    return saveData();
 }
 
 bool CustomerDAO::remove(const string &id) {
@@ -42,13 +42,13 @@ bool CustomerDAO::remove(const string &id) {
                 dataCache[j] = dataCache[j + 1];
             }
             dataCache.Pop_back();
-            return saveAll();
+            return saveData();
         }
     }
     return true;
 }
 
-bool CustomerDAO::loadAll() {
+bool CustomerDAO::loadData() {
     ifstream file(filename);
     if (!file.is_open()) {
         cout << "Cannot open file " << filename << endl;
@@ -71,7 +71,7 @@ bool CustomerDAO::loadAll() {
     return true;
 }
 
-bool CustomerDAO::saveAll() {
+bool CustomerDAO::saveData() {
     ofstream file(filename);
     if (!file.is_open()) {
         cout << "Cannot open " << filename << endl;

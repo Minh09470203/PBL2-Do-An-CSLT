@@ -14,9 +14,11 @@ public:
     bool remove(const string &id) override;
 
     // loadAll needs references to customers, staff and products to resolve pointers
-    bool loadAll(CustomerDAO &customerDAO, StaffDAO &staffDAO, ProductDAO &productDAO);
-    bool loadAll() override; // Not used but required by IDAO
-    bool saveAll() override;
+    bool loadData(CustomerDAO &customerDAO, StaffDAO &staffDAO, ProductDAO &productDAO);
+    bool loadData() override; // Not used but required by IDAO
+    bool saveData() override;
+    // Remove an invoice by pointer (useful when invoices may have placeholder IDs)
+    bool removeByPointer(Invoice* inv);
 };
 
 #endif // INVOICEDAO_H_INCLUDED

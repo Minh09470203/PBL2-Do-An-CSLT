@@ -59,13 +59,13 @@ bool SessionManager::isCustomer() { return currentCustomer != nullptr; }
 bool SessionManager::loadAllData() {
     cout << "Loading data from files..." << endl;
     bool success = true;
-    success &= accountDAO->loadAll();
-    success &= customerDAO->loadAll();
-    success &= staffDAO->loadAll();
-    success &= categoryDAO->loadAll();
-    success &= supplierDAO->loadAll();
-    success &= productDAO->loadAll(*supplierDAO, *categoryDAO);
-    success &= invoiceDAO->loadAll(*customerDAO, *staffDAO, *productDAO);
+    success &= accountDAO->loadData();
+    success &= customerDAO->loadData();
+    success &= staffDAO->loadData();
+    success &= categoryDAO->loadData();
+    success &= supplierDAO->loadData();
+    success &= productDAO->loadData(*supplierDAO, *categoryDAO);
+    success &= invoiceDAO->loadData(*customerDAO, *staffDAO, *productDAO);
     if (success) {
         cout << "All data loaded successfully!\n" << endl;
     } else {

@@ -39,13 +39,13 @@ bool StaffDAO::remove(const string &id) {
                 dataCache[j] = dataCache[j + 1];
             }
             dataCache.Pop_back();
-            return saveAll();
+            return saveData();
         }
     }
     return true;
 }
 
-bool StaffDAO::loadAll() {
+bool StaffDAO::loadData() {
     ifstream file(filename);
     if (!file.is_open()) {
         cout << "Cannot open file " << filename << endl;
@@ -66,8 +66,7 @@ bool StaffDAO::loadAll() {
     file.close();
     return true;
 }
-
-bool StaffDAO::saveAll() {
+bool StaffDAO::saveData() {
     ofstream file(filename);
     if (!file.is_open()) {
         cout << "Cannot open " << filename << endl;

@@ -4,25 +4,17 @@
 #include "../DataStructure/MyMap.h"
 #include "../Models/Category.h"
 
-class CategoryDAO : public MapDAO {
+class CategoryDAO : public MapDAO<Category> {
 public:
-    CategoryDAO(const string& file) : MapDAO(file) {}
-    // Get category name by ID
-    string getCategoryName(const string& id);
-    
-    // Add category (wrapper cho create)
-    bool addCategory(const string& id, const string& name);
-    
-    // Update category name
-    bool updateCategory(const string& id, const string& newName);
-    
-    // Delete category
-    bool deleteCategory(const string& id);
+    CategoryDAO(const string& file) : MapDAO<Category>(file) {}
+    ~CategoryDAO();
 
-    // Check if category exists
-    bool categoryExists(const string& id);
-
-    // Display
+    bool create(const string& id, Category* entity) override;
+    Category* read(const string& id) override;
+    bool update(const string& id, Category* entity) override;
+    bool remove(const string& id) override;
+    bool loadData() override;
+    bool saveData() override;
     void displayAll();
 };
 
