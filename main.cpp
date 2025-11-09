@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include "DataStructure/MyVector.h"
 #include <iomanip>
 #include "Models/Account.h"
 #include "Models/Person.h"
@@ -12,6 +13,7 @@
 #include "Models/Invoice.h"
 #include "Models/Product.h"
 #include "AppSession/SessionManager.h"
+#include "Models/StatsService.h"
 /*
              _ooOoo_
             o8888888o
@@ -61,11 +63,13 @@ void StaffMenu(CustomerDAO &customerDao, StaffDAO &staffDao,
             cout << "6. View Statistics\n";
             cout << "7. Change Password\n";
         } else {
-            // Staff thường - Limited menu
+            // Normal staff - Limited menu
             cout << "1. View Customer List\n";
             cout << "2. View Product List\n";
             cout << "3. Create Invoice\n";
-            cout << "4. Change Password\n";
+            cout << "4. Order Requests\n";
+            cout << "5. Order Status\n";
+            cout << "6. Change Password\n";
         }
         
         cout << "0. Logout\n";
@@ -150,11 +154,13 @@ void StaffMenu(CustomerDAO &customerDao, StaffDAO &staffDao,
                     cout << "1. View all invoices\n";
                     cout << "2. Create invoice\n";
                     cout << "3. View invoice detail\n";
+                    cout << "4. Order requests\n";
+                    cout << "5. Order status\n";
                     do {
                         cout << "Enter choice: ";
                         cin >> invChoice;
-                        if (invChoice < 1 || invChoice > 3) cout << "Invalid choice!" << endl;
-                    }while(invChoice < 1 || invChoice > 3);
+                        if (invChoice < 1 || invChoice > 5) cout << "Invalid choice!" << endl;
+                    }while(invChoice < 1 || invChoice > 5);
                     cin.ignore();
 
                     if (invChoice == 1) {
@@ -171,7 +177,13 @@ void StaffMenu(CustomerDAO &customerDao, StaffDAO &staffDao,
                         } else {
                             cout << "Invoice not found!\n";
                         }
-                    }   
+                    } else if (invChoice == 4) {
+                        // Process invoice requests (pending invoices where staff == nullptr)
+                        ProcessOrderRequests(invoiceDao, session.getCurrentStaff());
+                    } else if (invChoice == 5) {
+                        // Update invoice status (manager)
+                        HandleOrderStatusUpdate(invoiceDao);
+                    }
                     break;
                 }
                 case 4: {
@@ -211,17 +223,39 @@ void StaffMenu(CustomerDAO &customerDao, StaffDAO &staffDao,
                     break;
                 }
                 case 6: {
-                    cout << "\n--- Statistics ---\n";
-                    cout << "Total customers: " << customerDao.getDataCache().getSize() << endl;
-                    cout << "Total staff: " << staffDao.getDataCache().getSize() << endl;
-                    cout << "Total products: " << productDao.getDataCache().getSize() << endl;
-                    cout << "Total invoices: " << invoiceDao.getDataCache().getSize() << endl;
+                    // Manager statistics submenu (uses StatsService)
+                    StatsService stats(session);
+                    int sChoice = -1;
+                    do {
+                        cout << "\n--- Statistics ---\n";
+                        cout << "1. Dashboard (summary)\n";
+                        cout << "2. Revenue by month (year)\n";
+                        cout << "3. Top products by quantity\n";
+                        cout << "4. Top customers by revenue\n";
+                        cout << "5. Low-stock products\n";
+                        cout << "0. Back\n";
+                        cout << "Enter your choice: ";
+                        cin >> sChoice; cin.ignore();
 
-                    unsigned long totalRevenue = 0;
-                    for (int i = 0; i < invoiceDao.getDataCache().getSize(); i++) {
-                        totalRevenue += invoiceDao.getDataCache()[i]->getTotalAmount();
-                    }
-                    cout << "Total revenue: " << totalRevenue << " VND" << endl;
+                        if (sChoice == 1) {
+                            stats.printDashboard();
+                        } else if (sChoice == 2) {
+                            int year;
+                            cout << "Enter year: "; cin >> year; cin.ignore();
+                            stats.printRevenueByMonth(year);
+                        } else if (sChoice == 3) {
+                            int N; cout << "Top how many products? "; cin >> N; cin.ignore();
+                            stats.printTopProductsByQty(N);
+                        } else if (sChoice == 4) {
+                            int N; cout << "Top how many customers? "; cin >> N; cin.ignore();
+                            stats.printTopCustomersByRevenue(N);
+                        } else if (sChoice == 5) {
+                            int threshold; cout << "Show products with stock <= "; cin >> threshold; cin.ignore();
+                            stats.printLowStock(threshold);
+                        } else if (sChoice != 0) {
+                            cout << "Invalid choice!\n";
+                        }
+                    } while (sChoice != 0);
                     break;
                 }
                 case 7:
@@ -234,7 +268,7 @@ void StaffMenu(CustomerDAO &customerDao, StaffDAO &staffDao,
                     cout << "Invalid choice!\n";
             }
         } else {
-            // Staff thường menu handling
+            // Normal staff menu handling
             switch(choice) {
                 case 1: 
                     printCustomerList(customerDao); 
@@ -247,8 +281,19 @@ void StaffMenu(CustomerDAO &customerDao, StaffDAO &staffDao,
                 case 3: 
                     CreateInvoice(invoiceDao, customerDao, staffDao, productDao); 
                     break;
-                    
-                case 4: 
+                case 4:
+                    // Process invoice requests for normal staff
+                    ProcessOrderRequests(invoiceDao, session.getCurrentStaff());
+                    break;
+                
+                
+                case 5:
+                    // Update invoice status for normal staff (same as manager)
+                    HandleOrderStatusUpdate(invoiceDao);
+                    break;
+                
+
+                case 6: 
                     ChangePassword(accountDao); 
                     break;
                     
@@ -268,16 +313,17 @@ void CustomerMenu(ProductDAO &productDao,
                   InvoiceDAO &invoiceDao,
                   CustomerDAO &customerDao,
                   AccountDAO &accountDao) {
-    SessionManager& session = SessionManager::getInstance();
+    SessionManager& session = SessionManager::getInstance(); 
     int choice;
     do {
         cout << "\n========== CUSTOMER MENU ==========\n";
         cout << "Welcome: " << session.getCurrentCustomer()->getName() << "\n";
-        cout << "1. View products\n";
-        cout << "2. Search product\n";
-        cout << "3. View my invoices\n";
-        cout << "4. Update personal information\n";
-        cout << "5. Change Password\n";
+    cout << "1. View products\n";
+    cout << "2. Search product\n";
+    cout << "3. View my invoices\n";
+    cout << "4. Place Order\n";
+    cout << "5. Update personal information\n";
+    cout << "6. Change Password\n";
         cout << "0. Logout\n";
         cout << "Enter your choice: ";
         cin >> choice;
@@ -316,24 +362,70 @@ void CustomerMenu(ProductDAO &productDao,
             case 3: {
                 cout << "\n--- Your invoices ---\n";
                 bool found = false;
-                for (int i = 0; i < invoiceDao.getDataCache().getSize(); i++) {
-                    if (invoiceDao.getDataCache()[i]->getCustomer()->getID() == session.getCurrentCustomer()->getID()) {
-                        cout << "Invoice: " << invoiceDao.getDataCache()[i]->getIDhd()
-                             << " | Date: " << invoiceDao.getDataCache()[i]->getDate()
-                             << " | Total: " << invoiceDao.getDataCache()[i]->getTotalAmount() << " VND" << endl;
+                MyVector<Invoice*>& allInv = invoiceDao.getDataCache();
+                MyVector<Invoice*> pending; // pending for this customer
+                for (int i = 0; i < allInv.getSize(); i++) {
+                    Invoice* inv = allInv[i];
+                    if (inv->getCustomer() && inv->getCustomer()->getID() == session.getCurrentCustomer()->getID()) {
+                        cout << "Invoice: " << inv->getIDhd()
+                             << " | Date: " << inv->getDate()
+                             << " | Status: " << inv->getStatus()
+                             << " | Total: " << inv->getTotalAmount() << " VND" << endl;
                         found = true;
+                        if (inv->getStaff() == nullptr || inv->getStatus() == "Pending" || inv->getIDhd() == string("Waiting for confirmation")) {
+                            pending.Push_back(inv);
+                        }
                     }
                 }
                 if (!found) {
                     cout << "No invoices found.\n";
+                    break;
+                }
+
+                // Allow cancellation of pending invoices
+                if (!pending.Empty()) {
+                    cout << "\nYou have " << pending.getSize() << " pending invoice(s) that can be cancelled before staff confirmation." << endl;
+                    for (int i = 0; i < pending.getSize(); ++i) {
+                        Invoice* p = pending[i];
+                        cout << "[" << i+1 << "] " << "Date: " << p->getDate() << " | Total: " << p->getTotalAmount() << " VND" << endl;
+                    }
+                    cout << "Enter pending index to cancel (0 to skip): ";
+                    int pick = 0; cin >> pick; cin.ignore();
+                    if (pick > 0 && pick <= pending.getSize()) {
+                        Invoice* toCancel = pending[pick-1];
+                        cout << "Are you sure you want to cancel this order? (y/n): "; char c; cin >> c; cin.ignore();
+                        if (c == 'y' || c == 'Y') {
+                            // restore product quantities
+                            for (int k = 0; k < toCancel->getDetails().getSize(); ++k) {
+                                OrderDetail* od = toCancel->getDetails()[k];
+                                Product* prod = od->getProduct();
+                                if (prod) {
+                                    prod->setSLT(prod->getQuantity() + od->getQuantity());
+                                }
+                            }
+                            // persist product changes
+                            productDao.saveData();
+                            // remove invoice
+                            if (invoiceDao.removeByPointer(toCancel)) {
+                                cout << "Invoice cancelled and removed successfully." << endl;
+                            } else {
+                                cout << "Failed to remove invoice." << endl;
+                            }
+                        } else {
+                            cout << "Cancellation aborted." << endl;
+                        }
+                    }
                 }
                 break;
             }
-            case 4: {
+            case 4:
+                CreateInvoice(invoiceDao, customerDao, *session.getStaffDAO(), productDao);
+                break;
+            case 5: {
                 CustomerEdit(session.getCurrentCustomer(), customerDao);
                 break;
             }
-            case 5:
+            case 6:
                 ChangePassword(accountDao);
                 break;
             case 0:
@@ -357,8 +449,9 @@ int main() {
     int userType;
     do {
         cout << "\n=== MAIN MENU ===\n";
-        cout << "1. Login\n";
-        cout << "0. Exit\n";
+    cout << "1. Login\n";
+    cout << "2. Register (customer)\n";
+    cout << "0. Exit\n";
         cout << "Enter your choice: ";
         cin >> userType;
         cin.ignore();
@@ -370,6 +463,8 @@ int main() {
             } else if (loginResult == 2) {
                 CustomerMenu(*session.getProductDAO(), *session.getInvoiceDAO(), *session.getCustomerDAO(), *session.getAccountDAO());
             }
+        } else if (userType == 2) {
+            Register(*session.getCustomerDAO(), *session.getAccountDAO());
         } else if (userType == 0) {
             cout << "Thank you for using our system!\n";
         } else {
