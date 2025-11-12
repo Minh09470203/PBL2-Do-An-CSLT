@@ -12,17 +12,6 @@
 #include <iomanip>
 #include <cstdlib>
 
-// format number with thousand separators (2500000 -> 2,500,000)
-static string formatNumber(unsigned long v) {
-    string s = to_string(v);
-    int n = s.length();
-    int insertPos = n - 3;
-    while (insertPos > 0) {
-        s.insert(insertPos, ",");
-        insertPos -= 3;
-    }
-    return s;
-}
 
 
 StatsService::StatsService(SessionManager &sess) {

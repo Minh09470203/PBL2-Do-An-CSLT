@@ -15,7 +15,7 @@
 #include "AppSession/SessionManager.h"
 #include "Models/StatsService.h"
 
-// Enable UTF-8 / VT processing on Windows. We wrap include+helper in one #ifdef
+// Enable UTF-8 
 #ifdef _WIN32
 #include <windows.h>
 static void enableUtf8Console() {

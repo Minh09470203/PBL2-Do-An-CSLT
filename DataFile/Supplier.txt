@@ -1,15 +1,15 @@
-SUP01|Nike|Oregon, USA|contact@nike.com
-SUP02|Adidas|Bavaria, Germany|support@adidas.com
-SUP03|Converse|Massachusetts, USA|info@converse.com
-SUP04|Puma|Bavaria, Germany|sales@puma.com
-SUP05|New Balance|Massachusetts, USA|service@newbalance.com
-SUP06|Vans|California, USA|hello@vans.com
-SUP07|Reebok|Massachusetts, USA|contact@reebok.com
-SUP08|Under Armour|Maryland, USA|support@underarmour.com
-SUP09|ASICS|Hyogo, Japan|info@asics.com
-SUP10|Fila|Seoul, Korea|contact@fila.com
-SUP11|Skechers|California, USA|support@skechers.com
-SUP12|Jordan|Oregon, USA|jordan@nike.com
-SUP13|Timberland|New Hampshire, USA|info@timberland.com
-SUP14|Salomon|Annecy, France|contact@salomon.com
-SUP15|Mizuno|Osaka, Japan|support@mizuno.com
+SUP01|Nike|contact@nike.com|0903123456
+SUP02|Adidas|support@adidas.com|0918234567
+SUP03|Converse|info@converse.com|0987345678
+SUP04|Puma|sales@puma.com|0938-456-789
+SUP05|New Balance|service@newbalance.com|0978567890
+SUP06|Vans|hello@vans.com|0929678901
+SUP07|Reebok|contact@reebok.com|0961789012
+SUP08|Under Armour|support@underarmour.com|0943890123
+SUP09|ASICS|info@asics.com|0954901234
+SUP10|Fila|contact@fila.com|0995012345
+SUP11|Skechers|support@skechers.com|0886123456
+SUP12|Jordan|jordan@nike.com|0897234567
+SUP13|Timberland|info@timberland.com|0878345678
+SUP14|Salomon|contact@salomon.com|0869456789
+SUP15|Mizuno|support@mizuno.com|0850567890

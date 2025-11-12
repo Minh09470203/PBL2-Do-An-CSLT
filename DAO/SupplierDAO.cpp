@@ -10,7 +10,8 @@ using namespace std;
 static ofstream* globleOutputFile = nullptr;
 static void write_supplier_to_file(const string& k, Supplier* const& s) {
     if (!globleOutputFile) return;
-    *globleOutputFile << s->getSupID() << "|" << s->getSupName() << "|" << s->getAddress() << "|" << s->getEmail() << "\n";
+    // File format: SupID|Name|Email|Phone
+    *globleOutputFile << s->getSupID() << "|" << s->getSupName() << "|" << s->getEmail() << "|" << s->getPhoneNumber() << "\n";
 }
 static void delete_supplier_cb(const string& k, Supplier* const& s) {
     if (s) delete s;
@@ -32,10 +33,11 @@ bool SupplierDAO::create(const string &id, Supplier* entity) {
     dataCache.Insert(id, entity);
     ofstream file(filename, ios::app);
     if (!file.is_open()) return false;
+    // Persist in order: SupID|Name|Email|Phone
     file << entity->getSupID() << "|"
-         << entity->getSupName() << "|"
-         << entity->getAddress() << "|"
-         << entity->getEmail() << "\n";
+        << entity->getSupName() << "|"
+        << entity->getEmail() << "|"
+        << entity->getPhoneNumber() << "\n";
     file.close();
     return true;
 }
@@ -77,13 +79,14 @@ bool SupplierDAO::loadData() {
     while (getline(file, line)) {
         if (line.empty()) continue;
         stringstream ss(line);
-        string id, name, address, email;
+        string id, name, email, phone;
         getline(ss, id, '|');
         getline(ss, name, '|');
-        getline(ss, address, '|');
-        getline(ss, email);
-        if (!email.empty() && email.back() == '\r') email.pop_back();
-        Supplier* s = new Supplier(id, name, address, email);
+        getline(ss, email, '|');
+        getline(ss, phone);
+        if (!phone.empty() && phone.back() == '\r') phone.pop_back();
+        // constructor: ID, Name, Email, Phone
+        Supplier* s = new Supplier(id, name, email, phone);
         dataCache.Insert(id, s);
     }
     file.close();
@@ -106,7 +109,7 @@ bool SupplierDAO::saveData() {
 
 
 void SupplierDAO::displayAll() {
-    cout << left << setw(10) << "SupID" << setw(20) << "Supplier Name" << setw(25) << "Address" << setw(25) << "Email" << endl;
+    cout << left << setw(10) << "SupID" << setw(20) << "Supplier Name" << setw(25) << "Email" << setw(20) << "Phone" << endl;
     cout << string(80, '-') << endl;
     dataCache.ForEach(print_supplier_cb);
 }

@@ -135,7 +135,8 @@ void ProductInsert(ProductDAO &productDAO, SupplierDAO &supplierDAO, CategoryDAO
         Supplier *sup = nullptr;
         Supplier *supFromDao = supplierDAO.read(SupID);
         if (supFromDao) {
-            sup = new Supplier(supFromDao->getSupID(), supFromDao->getSupName(), supFromDao->getAddress(), supFromDao->getEmail());
+            // Supplier constructor: ID, Name, Email, Phone
+            sup = new Supplier(supFromDao->getSupID(), supFromDao->getSupName(), supFromDao->getEmail(), supFromDao->getPhoneNumber());
         } else {
             sup = new Supplier();
             sup->setSupID(SupID);
