@@ -12,7 +12,18 @@
 #include <iomanip>
 #include <cstdlib>
 
-// Use simple, easy-to-read code and only MyMap/MyVector from project
+// format number with thousand separators (2500000 -> 2,500,000)
+static string formatNumber(unsigned long v) {
+    string s = to_string(v);
+    int n = s.length();
+    int insertPos = n - 3;
+    while (insertPos > 0) {
+        s.insert(insertPos, ",");
+        insertPos -= 3;
+    }
+    return s;
+}
+
 
 StatsService::StatsService(SessionManager &sess) {
     session = &sess;
@@ -67,7 +78,6 @@ void StatsService::revenueByMonth(int year, unsigned long months[13]) {
     }
 }
 
-// print helpers
 void StatsService::printDashboard() {
     cout << "\n=== DASHBOARD ===\n";
     cout << "Total customers: " << customerDao->getDataCache().getSize() << "\n";
@@ -86,73 +96,116 @@ void StatsService::printRevenueByMonth(int year) {
     // find maximum to scale bars
     unsigned long maxRev = 0;
     for (int m = 1; m <= 12; ++m) if (months[m] > maxRev) maxRev = months[m];
-    const int maxBar = 30; // maximum bar width in characters (keep short to avoid wrap)
+    const int maxBar = 40; // maximum bar width in characters (keep short to avoid wrap)
     for (int m = 1; m <= 12; ++m) {
         unsigned long rev = months[m];
         int barLen = 0;
         if (maxRev > 0) barLen = (int)((__int128)rev * maxBar / maxRev); // avoid overflow
         if (rev > 0 && barLen == 0) barLen = 1; // ensure visible mark for small non-zero values
         if (barLen > maxBar) barLen = maxBar;
-        // build bar string using literal block character U+2588
-        string bar;
-        for (int i = 0; i < barLen; ++i) bar += "#";
-        // print line: Month X  [bar]  <amount> VND
-        cout << "Month " << setw(2) << m << " ";
-        if (!bar.empty()) cout << bar << " ";
-        cout << rev << " VND\n";
+    // build bar string using block character '█' (UTF-8)
+    string bar;
+    for (int i = 0; i < barLen; ++i) bar += "█";
+    // print line: Month X  [bar]  <amount> VND (formatted)
+    cout << "Month " << setw(2) << m << " ";
+    if (!bar.empty()) cout << bar << " ";
+    cout << formatNumber(rev) << " VND\n" << endl;
     }
 
-    // --- Analysis section ---
+    // --- Analysis section (cleaner, multi-line for readability) ---
     unsigned long totalYear = 0;
-    for (int m = 1; m <= 12; ++m) totalYear += months[m];
+    for (int i = 1; i <= 12; ++i) totalYear += months[i];
 
-    // previous year comparison
-    unsigned long prevMonths[13];
-    revenueByMonth(year - 1, prevMonths);
-    unsigned long totalPrev = 0;
-    for (int m = 1; m <= 12; ++m) totalPrev += prevMonths[m];
+    // helper to sum a year without extra globals
+    auto sumYear = [&](int y) -> unsigned long {
+        unsigned long tmp[13];
+        revenueByMonth(y, tmp);
+        unsigned long s = 0;
+        for (int i = 1; i <= 12; ++i) s += tmp[i];
+        return s;
+    };
 
-    // find max and min months
+    unsigned long totalPrev = sumYear(year - 1);
+    unsigned long totalPrevPrev = sumYear(year - 2);
+
     int maxMonth = -1, minMonth = -1;
     unsigned long maxVal = 0;
-    unsigned long minVal = (unsigned long)(-1);
-    for (int m = 1; m <= 12; ++m) {
-        unsigned long v = months[m];
-        if (maxMonth == -1 || v > maxVal) { maxVal = v; maxMonth = m; }
-        if (minMonth == -1 || v < minVal) { minVal = v; minMonth = m; }
+    unsigned long minVal = (unsigned long)-1;
+    for (int i = 1; i <= 12; ++i) {
+        unsigned long v = months[i];
+        if (maxMonth == -1 || v > maxVal) { maxVal = v; maxMonth = i; }
+        if (minMonth == -1 || v < minVal) { minVal = v; minMonth = i; }
     }
 
-    // Print a small ASCII box with analysis (narrower so it doesn't have too much empty space)
-    const int aWidth = 40;
+    const int aWidth = 60;
+    const string RESET = "\033[0m";
+    const string RED = "\033[31m";
+    const string GREEN = "\033[32m";
+
+    unsigned long avgMonth = totalYear / 12;
+
+    unsigned long forecastFromPrev = 0;
+    if (totalPrevPrev > 0 && totalPrev > 0) {
+        double growthRatePrev = ((double)totalPrev - (double)totalPrevPrev) / (double)totalPrevPrev;
+        double forecast_d = (double)totalPrev * (1.0 + growthRatePrev);
+        if (forecast_d < 0) forecast_d = 0;
+        forecastFromPrev = (unsigned long)(forecast_d + 0.5);
+    }
+
+    unsigned long forecastNext = 0;
+    if (totalPrev > 0) {
+        double growthRateCurr = ((double)totalYear - (double)totalPrev) / (double)totalPrev;
+        double fnext_d = (double)totalYear * (1.0 + growthRateCurr);
+        if (fnext_d < 0) fnext_d = 0;
+        forecastNext = (unsigned long)(fnext_d + 0.5);
+    }
+
     cout << "+" << string(aWidth, '-') << "+\n";
-    // Simple fixed padding title
-    cout << "|" << string(16, ' ') << "ANALYSIS" << string(16, ' ') << "|\n";
+    string title = "ANALYSIS";
+    int leftPad = (aWidth - (int)title.size()) / 2;
+    int rightPad = aWidth - (int)title.size() - leftPad;
+    cout << "|" << string(leftPad, ' ') << title << string(rightPad, ' ') << "|\n";
     cout << "+" << string(aWidth, '-') << "+\n";
-    // Total revenue
-    string totalLine = string("Total revenue: ") + to_string(totalYear) + " VND";
-    cout << "| " << left << setw(aWidth-4) << totalLine << "   |\n";
+
+    // Total revenue + forecast comparison
+    string totalLine = string("Total revenue: ") + formatNumber(totalYear) + " VND";
+    if (forecastFromPrev > 0) {
+        double pct = ((double)totalYear - (double)forecastFromPrev) * 100.0 / (double)forecastFromPrev;
+        char buf[64];
+        sprintf(buf, " (%+.2f%% vs forecast)    ", pct);
+        string pctStr(buf);
+        string colored = (pct >= 0.0) ? (GREEN + pctStr + RESET) : (RED + pctStr + RESET);
+        totalLine += colored;
+    } else {
+        totalLine += string(" (no prior forecast)");
+    }
+    cout << "| " << left << setw(aWidth - 4) << totalLine << "   |\n";
+
+    // Average and forecast next year
+    cout << "| " << left << setw(aWidth - 4) << (string("Average month: ") + formatNumber(avgMonth) + " VND") << "   |\n";
+    if (forecastNext > 0) cout << "| " << left << setw(aWidth - 4) << (string("Forecast next year: ") + formatNumber(forecastNext) + " VND") << "   |\n";
 
     // Growth vs previous year
     if (totalPrev == 0) {
-        string growthLine = string("Growth Vs ") + to_string(year-1) + string(": N/A (no data)");
-        cout << "| " << left << setw(aWidth-4) << growthLine << "   |\n";
+        cout << "| " << left << setw(aWidth - 4) << (string("Growth Vs ") + to_string(year - 1) + ": N/A (no data)") << "   |\n";
     } else {
         long long diff = (long long)totalYear - (long long)totalPrev;
         double pct = ((double)diff) * 100.0 / (double)totalPrev;
-        char pctbuf[64];
-        sprintf(pctbuf, "Growth Vs %d: %.2f%%", year-1, pct);
-        cout << "| " << left << setw(aWidth-4) << string(pctbuf) << "   |\n";
+        char buf2[64];
+        sprintf(buf2, "Growth Vs %d: %.2f%%", year - 1, pct);
+        string pctLine(buf2);
+        string colored = (pct >= 0.0) ? (GREEN + pctLine + RESET) : (RED + pctLine + RESET);
+        cout << "| " << left << setw(aWidth - 4) << colored << "            |\n";
     }
 
-    // Highest and lowest months
+    // Highest / lowest months
     if (maxMonth == -1) {
-        cout << "| " << left << setw(aWidth-4) << string("No revenue data for this year.") << " |\n";
+        cout << "| " << left << setw(aWidth - 4) << string("No revenue data for this year.") << "   |\n";
     } else {
-        char buf2[128];
-        sprintf(buf2, "Highest month: %02d (%lu VND)", maxMonth, maxVal);
-        cout << "| " << left << setw(aWidth-4) << string(buf2) << "   |\n";
-        sprintf(buf2, "Lowest month:  %02d (%lu VND)", minMonth, minVal);
-        cout << "| " << left << setw(aWidth-4) << string(buf2) << "   |\n";
+        string highLine = string("Highest month: ") + (maxMonth < 10 ? string("0") + to_string(maxMonth) : to_string(maxMonth)) + string(" (") + formatNumber(maxVal) + string(" VND)");
+        cout << "| " << left << setw(aWidth - 4) << highLine << "   |\n";
+        string lowLine = string("Lowest month:  ") + (minMonth < 10 ? string("0") + to_string(minMonth) : to_string(minMonth)) + string(" (") + formatNumber(minVal) + string(" VND)");
+        cout << "| " << left << setw(aWidth - 4) << lowLine << "   |\n";
     }
 
     cout << "+" << string(aWidth, '-') << "+\n";
@@ -180,9 +233,9 @@ static void collectProdCallback(const string &k, const unsigned long &v) {
 }
 
 void StatsService::printTopProductsByQty(int N) {
-    // Build qty map and revenue map
-    MyMap<string, unsigned long> qtyMap; // pid -> qty
-    MyMap<string, unsigned long> revMap; // pid -> revenue
+    // Simple, self-contained aggregation using MyVector only
+    struct Agg { string id; string name; unsigned long qty; unsigned long revenue; };
+    MyVector<Agg> vec;
 
     MyVector<Invoice*>& invs = invoiceDao->getDataCache();
     for (int i = 0; i < invs.getSize(); ++i) {
@@ -191,24 +244,24 @@ void StatsService::printTopProductsByQty(int N) {
             OrderDetail* od = inv->getDetails()[j];
             if (!od || !od->getProduct()) continue;
             string pid = od->getProduct()->getIDsp();
-            qtyMap[pid] = qtyMap[pid] + od->getQuantity();
-            revMap[pid] = revMap[pid] + (unsigned long)od->getQuantity() * od->getUnitPrice();
+            unsigned long q = od->getQuantity();
+            unsigned long r = (unsigned long)q * od->getUnitPrice();
+            int idx = -1;
+            for (int k = 0; k < vec.getSize(); ++k) if (vec[k].id == pid) { idx = k; break; }
+            if (idx == -1) {
+                Agg a; a.id = pid; a.name = pid; a.qty = q; a.revenue = r; vec.Push_back(a);
+            } else {
+                vec[idx].qty += q; vec[idx].revenue += r;
+            }
         }
     }
 
-    // collect into vector
-    MyVector<ProdAgg> vec;
-    g_prodAggVec = &vec; g_revMap = &revMap;
-    qtyMap.ForEach(collectProdCallback);
-    g_prodAggVec = nullptr; g_revMap = nullptr;
-
-    // Fill product names
+    // fill names
     for (int i = 0; i < vec.getSize(); ++i) {
         Product* p = productDao->read(vec[i].id);
         if (p) vec[i].name = p->getNamesp();
     }
 
-    // Selection sort top-N (simple, no STL)
     int total = vec.getSize();
     int limit = (N < total) ? N : total;
     cout << "\nTop " << limit << " products by quantity:\n";
@@ -216,44 +269,28 @@ void StatsService::printTopProductsByQty(int N) {
     cout << string(70, '-') << "\n";
     for (int k = 0; k < limit; ++k) {
         int best = k;
-        for (int j = k+1; j < total; ++j) {
-            if (vec[j].qty > vec[best].qty) best = j;
-        }
-        if (best != k) {
-            ProdAgg tmp = vec[k]; vec[k] = vec[best]; vec[best] = tmp;
-        }
-        cout << left << setw(10) << vec[k].id << setw(30) << vec[k].name << setw(10) << vec[k].qty << setw(15) << vec[k].revenue << "\n";
+        for (int j = k+1; j < total; ++j) if (vec[j].qty > vec[best].qty) best = j;
+        if (best != k) { Agg tmp = vec[k]; vec[k] = vec[best]; vec[best] = tmp; }
+        cout << left << setw(10) << vec[k].id << setw(30) << vec[k].name << setw(10) << vec[k].qty << setw(15) << formatNumber(vec[k].revenue) << "\n";
     }
 }
 
 // Implement top customers by revenue
 void StatsService::printTopCustomersByRevenue(int N) {
-    MyMap<string, unsigned long> custMap; // cid -> amount
+    struct Cust { string id; string name; unsigned long amount; };
+    MyVector<Cust> vec;
+
     MyVector<Invoice*>& invs = invoiceDao->getDataCache();
     for (int i = 0; i < invs.getSize(); ++i) {
         Invoice* inv = invs[i];
         if (!inv->getCustomer()) continue;
         string cid = inv->getCustomer()->getID();
-        custMap[cid] = custMap[cid] + inv->getTotalAmount();
+        unsigned long amt = inv->getTotalAmount();
+        int idx = -1;
+        for (int k = 0; k < vec.getSize(); ++k) if (vec[k].id == cid) { idx = k; break; }
+        if (idx == -1) { Cust c; c.id = cid; c.name = cid; c.amount = amt; vec.Push_back(c); }
+        else vec[idx].amount += amt;
     }
-    // collect into vector
-    struct CustAgg { string id; string name; unsigned long amount; };
-    MyVector<CustAgg> vec;
-    // callback helper
-    static MyVector<CustAgg>* g_custVec = nullptr;
-    static MyMap<string, unsigned long>* g_custMapPtr = nullptr;
-    g_custMapPtr = &custMap;
-    // build vector via ForEach
-    // We cannot easily pass closure, so emulate similar to product approach
-    // Implement a simple traversal by using ForEach with a static collector
-    // Create a local function
-    struct LocalHelper { static void collect(const string &k, const unsigned long &v) {
-            if (!g_custVec) return; CustAgg c; c.id = k; c.amount = v; c.name = k; g_custVec->Push_back(c);
-        }
-    };
-    g_custVec = &vec;
-    custMap.ForEach(LocalHelper::collect);
-    g_custVec = nullptr; g_custMapPtr = nullptr;
 
     for (int i = 0; i < vec.getSize(); ++i) {
         Customer* c = customerDao->read(vec[i].id);
@@ -267,13 +304,9 @@ void StatsService::printTopCustomersByRevenue(int N) {
     cout << string(60, '-') << "\n";
     for (int k = 0; k < limit; ++k) {
         int best = k;
-        for (int j = k+1; j < total; ++j) {
-            if (vec[j].amount > vec[best].amount) best = j;
-        }
-        if (best != k) {
-            CustAgg tmp = vec[k]; vec[k] = vec[best]; vec[best] = tmp;
-        }
-        cout << left << setw(10) << vec[k].id << setw(30) << vec[k].name << setw(15) << vec[k].amount << "\n";
+        for (int j = k+1; j < total; ++j) if (vec[j].amount > vec[best].amount) best = j;
+        if (best != k) { Cust tmp = vec[k]; vec[k] = vec[best]; vec[best] = tmp; }
+        cout << left << setw(10) << vec[k].id << setw(30) << vec[k].name << setw(15) << formatNumber(vec[k].amount) << "\n";
     }
 }
 
@@ -324,5 +357,3 @@ void StatsService::printLowStock(int threshold) {
     // bottom border
     cout << "+" << string(totalWidth, '-') << "+\n";
 }
-
-// CSV export removed per user request.

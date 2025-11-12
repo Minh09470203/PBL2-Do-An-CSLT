@@ -14,6 +14,25 @@
 #include "Models/Product.h"
 #include "AppSession/SessionManager.h"
 #include "Models/StatsService.h"
+
+// Enable UTF-8 / VT processing on Windows. We wrap include+helper in one #ifdef
+#ifdef _WIN32
+#include <windows.h>
+static void enableUtf8Console() {
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut != INVALID_HANDLE_VALUE) {
+        DWORD dwMode = 0;
+        if (GetConsoleMode(hOut, &dwMode)) {
+            dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+            SetConsoleMode(hOut, dwMode);
+        }
+    }
+}
+#else
+static void enableUtf8Console() { /* no-op on non-Windows */ }
+#endif
 /*
              _ooOoo_
             o8888888o
@@ -438,6 +457,8 @@ void CustomerMenu(ProductDAO &productDao,
 }
 
 int main() {
+    // enable UTF-8 console where supported
+    enableUtf8Console();
     SessionManager& session = SessionManager::getInstance();
     session.loadAllData();
     cout << "===> SHOE STORE MANAGEMENT APPLICATION <===" << endl;
