@@ -1,12 +1,12 @@
 #include "StatsService.h"
 #include "../AppSession/SessionManager.h"
-#include "../DAO/InvoiceDAO.h"
+#include "../DAO/OrderDAO.h"
 #include "../DAO/ProductDAO.h"
 #include "../DAO/CustomerDAO.h"
 #include "../DAO/StaffDAO.h"
 #include "../DAO/CategoryDAO.h"
 #include "../DAO/SupplierDAO.h"
-#include "Invoice.h"
+#include "Order.h"
 #include "OrderDetail.h"
 #include "Product.h"
 #include <iomanip>
@@ -16,7 +16,7 @@
 
 StatsService::StatsService(SessionManager &sess) {
     session = &sess;
-    invoiceDao = session->getInvoiceDAO();
+    orderDao = session->getOrderDAO();
     productDao = session->getProductDAO();
     customerDao = session->getCustomerDAO();
     staffDao = session->getStaffDAO();
@@ -47,20 +47,20 @@ void StatsService::parseDate(const string &s, int &d, int &m, int &y) {
 
 unsigned long StatsService::totalRevenue() {
     unsigned long total = 0;
-    MyVector<Invoice*>& invs = invoiceDao->getDataCache();
+    MyVector<Order*>& invs = orderDao->getDataCache();
     for (int i = 0; i < invs.getSize(); ++i) {
         total += invs[i]->getTotalAmount();
     }
     return total;
 }
 
-int StatsService::invoiceCount() {
-    return invoiceDao->getDataCache().getSize();
+int StatsService::orderCount() {
+    return orderDao->getDataCache().getSize();
 }
 
 void StatsService::revenueByMonth(int year, unsigned long months[13]) {
     for (int i = 0; i < 13; ++i) months[i] = 0;
-    MyVector<Invoice*>& invs = invoiceDao->getDataCache();
+    MyVector<Order*>& invs = orderDao->getDataCache();
     for (int i = 0; i < invs.getSize(); ++i) {
         int d,m,y; parseDate(invs[i]->getDate(), d, m, y);
         if (y == year && m >=1 && m <= 12) months[m] += invs[i]->getTotalAmount();
@@ -72,7 +72,7 @@ void StatsService::printDashboard() {
     cout << "Total customers: " << customerDao->getDataCache().getSize() << "\n";
     cout << "Total staff: " << staffDao->getDataCache().getSize() << "\n";
     cout << "Total products: " << productDao->getDataCache().getSize() << "\n";
-    cout << "Total invoices: " << invoiceDao->getDataCache().getSize() << "\n";
+    cout << "Total orders: " << orderDao->getDataCache().getSize() << "\n";
     cout << "Total revenue: " << totalRevenue() << " VND\n";
 }
 
@@ -226,11 +226,11 @@ void StatsService::printTopProductsByQty(int N) {
     struct Agg { string id; string name; unsigned long qty; unsigned long revenue; };
     MyVector<Agg> vec;
 
-    MyVector<Invoice*>& invs = invoiceDao->getDataCache();
-    for (int i = 0; i < invs.getSize(); ++i) {
-        Invoice* inv = invs[i];
-        for (int j = 0; j < inv->getDetails().getSize(); ++j) {
-            OrderDetail* od = inv->getDetails()[j];
+    MyVector<Order*>& ords = orderDao->getDataCache();
+    for (int i = 0; i < ords.getSize(); ++i) {
+        Order* ord = ords[i];
+        for (int j = 0; j < ord->getDetails().getSize(); ++j) {
+            OrderDetail* od = ord->getDetails()[j];
             if (!od || !od->getProduct()) continue;
             string pid = od->getProduct()->getIDsp();
             unsigned long q = od->getQuantity();
@@ -255,7 +255,7 @@ void StatsService::printTopProductsByQty(int N) {
     int limit = (N < total) ? N : total;
     cout << "\nTop " << limit << " products by quantity:\n";
     cout << left << setw(10) << "ID" << setw(30) << "Name" << setw(10) << "Qty" << setw(15) << "Revenue" << "\n";
-    cout << string(70, '-') << "\n";
+    cout << string(60, '-') << "\n";
     for (int k = 0; k < limit; ++k) {
         int best = k;
         for (int j = k+1; j < total; ++j) if (vec[j].qty > vec[best].qty) best = j;
@@ -269,12 +269,12 @@ void StatsService::printTopCustomersByRevenue(int N) {
     struct Cust { string id; string name; unsigned long amount; };
     MyVector<Cust> vec;
 
-    MyVector<Invoice*>& invs = invoiceDao->getDataCache();
-    for (int i = 0; i < invs.getSize(); ++i) {
-        Invoice* inv = invs[i];
-        if (!inv->getCustomer()) continue;
-        string cid = inv->getCustomer()->getID();
-        unsigned long amt = inv->getTotalAmount();
+    MyVector<Order*>& ords = orderDao->getDataCache();
+    for (int i = 0; i < ords.getSize(); ++i) {
+        Order* ord = ords[i];
+        if (!ord->getCustomer()) continue;
+        string cid = ord->getCustomer()->getID();
+        unsigned long amt = ord->getTotalAmount();
         int idx = -1;
         for (int k = 0; k < vec.getSize(); ++k) if (vec[k].id == cid) { idx = k; break; }
         if (idx == -1) { Cust c; c.id = cid; c.name = cid; c.amount = amt; vec.Push_back(c); }
@@ -290,7 +290,7 @@ void StatsService::printTopCustomersByRevenue(int N) {
     int limit = (N < total) ? N : total;
     cout << "\nTop " << limit << " customers by revenue:\n";
     cout << left << setw(10) << "ID" << setw(30) << "Name" << setw(15) << "Amount" << "\n";
-    cout << string(60, '-') << "\n";
+    cout << string(50, '-') << "\n";
     for (int k = 0; k < limit; ++k) {
         int best = k;
         for (int j = k+1; j < total; ++j) if (vec[j].amount > vec[best].amount) best = j;

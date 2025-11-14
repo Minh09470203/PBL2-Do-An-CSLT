@@ -8,7 +8,7 @@
 
 // Forward DAO declarations
 class SessionManager;
-class InvoiceDAO;
+class OrderDAO;
 class ProductDAO;
 class CustomerDAO;
 class StaffDAO;
@@ -20,7 +20,7 @@ using namespace std;
 class StatsService {
 private:
     SessionManager* session;
-    InvoiceDAO* invoiceDao;
+    OrderDAO* orderDao;
     ProductDAO* productDao;
     CustomerDAO* customerDao;
     StaffDAO* staffDao;
@@ -34,7 +34,7 @@ public:
     StatsService(SessionManager &sess);
 
     unsigned long totalRevenue();
-    int invoiceCount();
+    int orderCount();
     void revenueByMonth(int year, unsigned long months[13]); // months[1..12]
 
     // Reports printed directly (keep interface simple)

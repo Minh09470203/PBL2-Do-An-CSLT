@@ -1,21 +1,18 @@
-#include "InvoiceDAO.h"
-#include "CustomerDAO.h"
-#include "StaffDAO.h"
-#include "ProductDAO.h"
+#include "OrderDAO.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 using namespace std;
 
-bool InvoiceDAO::create(const string &id, Invoice* entity) {
+bool OrderDAO::create(const string &id, Order* entity) {
     dataCache.Push_back(entity);
     ofstream file(filename, ios::app);
     if (!file.is_open()) {
         cout << "Cannot open " << filename << endl;
         return false;
     }
-    // write header (new order: ID|Date|Status|CustomerID|StaffID|Total)
+    // write header (new order: ID|Date|Status|CustomerID|Total)
     file << entity->getIDhd() << "|" << entity->getDate() << "|"
         << (entity->getStatus().empty() ? string("") : entity->getStatus()) << "|"
         << (entity->getCustomer() ? entity->getCustomer()->getID() : string("")) << "|"
@@ -30,18 +27,18 @@ bool InvoiceDAO::create(const string &id, Invoice* entity) {
     return true;
 }
 
-Invoice* InvoiceDAO::read(const string &id) {
+Order* OrderDAO::read(const string &id) {
     for (int i = 0; i < dataCache.getSize(); ++i) {
         if (dataCache[i]->getIDhd() == id) return dataCache[i];
     }
     return nullptr;
 }
 
-bool InvoiceDAO::update(const string &id, Invoice* entity) {
+bool OrderDAO::update(const string &id, Order* entity) {
     return saveData();
 }
 
-bool InvoiceDAO::remove(const string &id) {
+bool OrderDAO::remove(const string &id) {
     for (int i = 0; i < dataCache.getSize(); ++i) {
         if (dataCache[i]->getIDhd() == id) {
             delete dataCache[i];
@@ -53,7 +50,7 @@ bool InvoiceDAO::remove(const string &id) {
     return true;
 }
 
-bool InvoiceDAO::loadData(CustomerDAO &customerDAO, StaffDAO &staffDAO, ProductDAO &productDAO) {
+bool OrderDAO::loadData(CustomerDAO &customerDAO, StaffDAO &staffDAO, ProductDAO &productDAO) {
     ifstream file(filename);
     if (!file.is_open()) {
         cout << "Cannot open file " << filename << endl;
@@ -61,7 +58,7 @@ bool InvoiceDAO::loadData(CustomerDAO &customerDAO, StaffDAO &staffDAO, ProductD
     }
 
     string line;
-    Invoice* currentInvoice = nullptr;
+    Order* currentOrder = nullptr;
 
     while (getline(file, line)) {
         if (line.empty()) continue;
@@ -78,41 +75,23 @@ bool InvoiceDAO::loadData(CustomerDAO &customerDAO, StaffDAO &staffDAO, ProductD
             getline(ss, totalStr);
 
             Customer* cust = customerDAO.read(custID);
-            Staff* staff = nullptr;
+            unsigned long total = 0;
+            try { if (!totalStr.empty()) total = stoul(totalStr); } catch (...) { total = 0; }
+            Staff* staffPtr = nullptr;
+            if (!staffID.empty() && staffID != string("Waiting for confirmation")) {
+                staffPtr = staffDAO.read(staffID);
+            }
 
             if (cust) {
-                if (staffID != "Waiting for confirmation") {
-                    staff = staffDAO.read(staffID);
-                    if (!staff) {
-                        cout << "Warning: Staff " << staffID << " not found for invoice " << invID << endl;
-                    }
-                }
-
-                unsigned long total = 0;
-                try {
-                    if (!totalStr.empty()) total = stoul(totalStr);
-                } catch (const std::exception &e) {
-                    cout << "Warning: invalid total '" << totalStr << "' for invoice " << invID << ". Defaulting to 0." << endl;
-                    total = 0;
-                }
-
-                currentInvoice = new Invoice(invID, date, cust, staff, total, status);
-                dataCache.Push_back(currentInvoice);
+                currentOrder = new Order(invID, date, cust, staffPtr, total, status);
+                dataCache.Push_back(currentOrder);
             } else {
-                // create invoice with nullptr refs to avoid crash but still store
-                unsigned long total = 0;
-                try {
-                    if (!totalStr.empty()) total = stoul(totalStr);
-                } catch (const std::exception &e) {
-                    cout << "Warning: invalid total '" << totalStr << "' for invoice " << invID << ". Defaulting to 0." << endl;
-                    total = 0;
-                }
-                currentInvoice = new Invoice(invID, date, nullptr, nullptr, total, status);
-                dataCache.Push_back(currentInvoice);
-                cout << "Warning: Customer " << custID << " not found for invoice " << invID << endl;
+                currentOrder = new Order(invID, date, nullptr, staffPtr, total, status);
+                dataCache.Push_back(currentOrder);
+                cout << "Warning: Customer " << custID << " not found for order " << invID << endl;
             }
         } else {
-            if (currentInvoice != nullptr) {
+            if (currentOrder != nullptr) {
                 stringstream dss(line.substr(1));
                 string prodID, qtyStr, priceStr;
                 getline(dss, prodID, '|');
@@ -123,9 +102,9 @@ bool InvoiceDAO::loadData(CustomerDAO &customerDAO, StaffDAO &staffDAO, ProductD
 
                 if (prod) {
                     OrderDetail* od = new OrderDetail(prod, stoi(qtyStr), stoul(priceStr));
-                    currentInvoice->addDetail(od);
+                    currentOrder->addDetail(od);
                 } else {
-                    cout << "Warning: Product " << prodID << " not found for invoice details" << endl;
+                    cout << "Warning: Product " << prodID << " not found for order details" << endl;
                 }
             }
         }
@@ -135,27 +114,27 @@ bool InvoiceDAO::loadData(CustomerDAO &customerDAO, StaffDAO &staffDAO, ProductD
     return true;
 }
 
-bool InvoiceDAO::loadData() {
+bool OrderDAO::loadData() {
     // Not used but required by IDAO
     return false;
 }
 
-bool InvoiceDAO::saveData() {
+bool OrderDAO::saveData() {
     ofstream file(filename);
     if (!file.is_open()) {
-        cout << "Cannot open " << filename << endl;
+        cout << "Cannot open file " << filename << endl;
         return false;
     }
 
     for (int i = 0; i < dataCache.getSize(); ++i) {
-        Invoice* inv = dataCache[i];
-           file << inv->getIDhd() << "|" << inv->getDate() << "|"
-               << (inv->getStatus().empty() ? string("") : inv->getStatus()) << "|"
-               << (inv->getCustomer() ? inv->getCustomer()->getID() : string("")) << "|"
-               << (inv->getStaff() ? inv->getStaff()->getIDnv() : string("Waiting for confirmation")) << "|"
-               << inv->getTotalAmount() << "\n";
-        for (int k = 0; k < inv->getDetails().getSize(); ++k) {
-            OrderDetail* od = inv->getDetails()[k];
+        Order* ord = dataCache[i];
+           file << ord->getIDhd() << "|" << ord->getDate() << "|"
+               << (ord->getStatus().empty() ? string("") : ord->getStatus()) << "|"
+               << (ord->getCustomer() ? ord->getCustomer()->getID() : string("")) << "|"
+               << (ord->getStaff() ? ord->getStaff()->getIDnv() : string("Waiting for confirmation")) << "|"
+               << ord->getTotalAmount() << "\n";
+        for (int k = 0; k < ord->getDetails().getSize(); ++k) {
+            OrderDetail* od = ord->getDetails()[k];
             file << "-" << od->getProduct()->getIDsp() << "|" << od->getQuantity() << "|" << od->getUnitPrice() << "\n";
         }
     }
@@ -164,10 +143,10 @@ bool InvoiceDAO::saveData() {
     return true;
 }
 
-bool InvoiceDAO::removeByPointer(Invoice* inv) {
-    if (!inv) return false;
+bool OrderDAO::removeByPointer(Order* ord) {
+    if (!ord) return false;
     for (int i = 0; i < dataCache.getSize(); ++i) {
-        if (dataCache[i] == inv) {
+        if (dataCache[i] == ord) {
             delete dataCache[i];
             for (int j = i; j < dataCache.getSize() - 1; ++j) dataCache[j] = dataCache[j+1];
             dataCache.Pop_back();

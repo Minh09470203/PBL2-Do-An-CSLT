@@ -13,7 +13,7 @@ SessionManager::SessionManager() {
     categoryDAO = new CategoryDAO("DataFile/Category.txt");
     supplierDAO = new SupplierDAO("DataFile/Supplier.txt");
     productDAO = new ProductDAO("DataFile/Product.txt");
-    invoiceDAO = new InvoiceDAO("DataFile/Invoice.txt");
+    orderDAO = new OrderDAO("DataFile/Order.txt");
 }
 
 SessionManager& SessionManager::getInstance() {
@@ -28,7 +28,7 @@ string SessionManager::getCurrentUsername() { return currentUsername; }
 CustomerDAO* SessionManager::getCustomerDAO() { return customerDAO; }
 StaffDAO* SessionManager::getStaffDAO() { return staffDAO; }
 ProductDAO* SessionManager::getProductDAO() { return productDAO; }
-InvoiceDAO* SessionManager::getInvoiceDAO() { return invoiceDAO; }
+OrderDAO* SessionManager::getOrderDAO() { return orderDAO; }
 AccountDAO* SessionManager::getAccountDAO() { return accountDAO; }
 CategoryDAO* SessionManager::getCategoryDAO() { return categoryDAO; }
 SupplierDAO* SessionManager::getSupplierDAO() { return supplierDAO; }
@@ -65,7 +65,7 @@ bool SessionManager::loadAllData() {
     success &= categoryDAO->loadData();
     success &= supplierDAO->loadData();
     success &= productDAO->loadData(*supplierDAO, *categoryDAO);
-    success &= invoiceDAO->loadData(*customerDAO, *staffDAO, *productDAO);
+    success &= orderDAO->loadData(*customerDAO, *staffDAO, *productDAO);
     if (success) {
         cout << "All data loaded successfully!\n" << endl;
     } else {
@@ -83,6 +83,6 @@ SessionManager::~SessionManager() {
     delete categoryDAO;
     delete supplierDAO;
     delete productDAO;
-    delete invoiceDAO;
+    delete orderDAO;
 }
 SessionManager* SessionManager::instance = nullptr;

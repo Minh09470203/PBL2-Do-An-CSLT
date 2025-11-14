@@ -1,12 +1,12 @@
-#ifndef INVOICE_H_INCLUDED
-#define INVOICE_H_INCLUDED
+#ifndef ORDER_H_INCLUDED
+#define ORDER_H_INCLUDED
 #include "Customer.h"
 #include "Staff.h"
 #include "Product.h"
 #include "OrderDetail.h"
 #include "../DataStructure/MyVector.h"
 
-class Invoice {
+class Order {
 private:
     string ID_HD;
     string Date;
@@ -14,9 +14,9 @@ private:
     Staff *nv;
     unsigned long TotalAmount;
     MyVector<OrderDetail*> details;
-    string Status;
+    string orderStatus;
 public:
-    Invoice(
+    Order(
             string ID_HD = "",
             string Date = "",
             Customer *kh = nullptr,
@@ -24,9 +24,9 @@ public:
         unsigned long TotalAmount = 0,
         string Status = string("")
     )
-    : ID_HD(ID_HD), Date(Date), kh(kh), nv(nv), TotalAmount(TotalAmount), Status(Status) {}
+    : ID_HD(ID_HD), Date(Date), kh(kh), nv(nv), TotalAmount(TotalAmount), orderStatus(Status) {}
 
-    ~Invoice() {
+    ~Order() {
         for (int i = 0; i < details.getSize(); i++) {
             delete details[i];
         }
@@ -36,12 +36,12 @@ public:
     string getDate();
     Customer *getCustomer();
     Staff *getStaff();
+    void setStaff(Staff *nv);
     MyVector<OrderDetail*>& getDetails();
     unsigned long getTotalAmount();
     string getStatus();
     void setStatus(const string &status);
-    void setInfo(string id, string date, Customer *customer, Staff *staff);
-    void setStaff(Staff *staff);
+    void setInfo(string id, string date, Customer *customer);
     void advanceStatus();
 
     void calculateTotal();
@@ -53,20 +53,19 @@ public:
     // (now declared as free functions below)
 };
 
-// Declarations invoice functions
+// Declarations order functions
 // Forward declare DAO types used in prototypes
-class InvoiceDAO;
+class OrderDAO;
 class CustomerDAO;
 class StaffDAO;
 class ProductDAO;
 
-void CreateInvoice(InvoiceDAO &invoiceDAO, CustomerDAO &customerDAO, 
-                   StaffDAO &staffDAO, ProductDAO &productDAO);
+void CreateOrder(OrderDAO &orderDAO, CustomerDAO &customerDAO, ProductDAO &productDAO);
 
 // Free helper functions (moved out of class)
-void ProcessOrderRequests(InvoiceDAO &invoiceDao, Staff *currentStaff);
-void HandleOrderStatusUpdate(InvoiceDAO &invoiceDao);
+void ProcessOrderRequests(OrderDAO &orderDao, Staff *currentStaff);
+void HandleOrderStatusUpdate(OrderDAO &orderDao);
 
-void printInvoiceList(InvoiceDAO &invoiceDAO);
+void printOrderList(OrderDAO &orderDAO);
 
-#endif // INVOICE_H_INCLUDED
+#endif // ORDER_H_INCLUDED

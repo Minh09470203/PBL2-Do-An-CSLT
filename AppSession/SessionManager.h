@@ -7,7 +7,7 @@
 #include "../DAO/CustomerDAO.h"
 #include "../DAO/StaffDAO.h"
 #include "../DAO/ProductDAO.h"
-#include "../DAO/InvoiceDAO.h"
+#include "../DAO/OrderDAO.h"
 #include "../DAO/AccountDAO.h"
 #include "../DAO/CategoryDAO.h"
 #include "../DAO/SupplierDAO.h"
@@ -23,7 +23,7 @@ private:
     CustomerDAO* customerDAO;
     StaffDAO* staffDAO;
     ProductDAO* productDAO;
-    InvoiceDAO* invoiceDAO;
+    OrderDAO* orderDAO;
     AccountDAO* accountDAO;
     CategoryDAO* categoryDAO;
     SupplierDAO* supplierDAO;
@@ -43,7 +43,7 @@ public:
     CustomerDAO* getCustomerDAO();
     StaffDAO* getStaffDAO();
     ProductDAO* getProductDAO();
-    InvoiceDAO* getInvoiceDAO();
+    OrderDAO* getOrderDAO();
     AccountDAO* getAccountDAO();
     CategoryDAO* getCategoryDAO();
     SupplierDAO* getSupplierDAO();
