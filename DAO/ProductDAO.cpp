@@ -87,7 +87,7 @@ bool ProductDAO::loadData(SupplierDAO &supplierDAO, CategoryDAO &categoryDAO) {
         Category* cateFromDao = categoryDAO.read(cateID);
         cate->setName_Category(cateFromDao ? cateFromDao->getName_Category() : "Unknown Category");
 
-        Product *p = new Product(id, name, color, stoi(sizeStr), stoul(priceStr), stoi(qtyStr), sup, cate);
+    Product *p = new Product(id, name, color, sizeStr, stoul(priceStr), stoi(qtyStr), sup, cate);
         dataCache.Push_back(p);
     }
     file.close();

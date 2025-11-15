@@ -32,7 +32,7 @@ istream& Product::input(istream& is) {
     cout << "Enter ID: "; getline(is, ID_SP);
     cout << "Enter shoe name: "; getline(is, Shoe_Name);
     cout << "Enter color: "; getline(is, Color);
-    cout << "Enter size: "; is >> Size; is.ignore();
+    cout << "Enter size: "; getline(is, Size);
     cout << "Enter price: "; is >> Price; is.ignore();
     cout << "Enter stock quantity: "; is >> SLT; is.ignore();
     return is;
@@ -43,7 +43,7 @@ istream& operator>>(istream& is, Product& p) { return p.input(is); }
 string Product::getIDsp() { return ID_SP; }
 string Product::getNamesp() { return Shoe_Name; }
 string Product::getColor() { return Color; }
-int Product::getSize() { return Size; }
+string Product::getSize() { return Size; }
 int Product::getPrice() { return Price; }
 int Product::getQuantity() { return SLT; }
 Supplier *Product::getSupplier() { return sup; }
@@ -143,7 +143,7 @@ void ProductInsert(ProductDAO &productDAO, SupplierDAO &supplierDAO, CategoryDAO
             sup->setSupName("Unknown Supplier");
         }
 
-        Product *p = new Product(masp, tensp, color, shoeSize, gia, soluongton, sup, cate);
+    Product *p = new Product(masp, tensp, color, to_string(shoeSize), gia, soluongton, sup, cate);
         if (productDAO.create(masp, p)) {
             cout << "Product added successfully." << endl;
         } else {
@@ -154,13 +154,29 @@ void ProductInsert(ProductDAO &productDAO, SupplierDAO &supplierDAO, CategoryDAO
     }
 }
 
-Product* ProductSearchByIDName(ProductDAO &productDAO, string key) {
+Product* ProductSearchByKey(ProductDAO &productDAO, string key) {
     MyVector<Product*>& sp = productDAO.getDataCache();
+
+    // If key equals ID or Name -> return first match (unchanged behavior)
     for (int i = 0; i < sp.getSize(); i++) {
-        if (sp[i]->getIDsp() == key || sp[i]->getNamesp() == key) {
-            return sp[i];
-        }
+        Product* p = sp[i]; if (!p) continue;
+        if (p->getIDsp() == key || p->getNamesp() == key) return p;
     }
+
+    // For Color or Size: collect and print all matches
+    MyVector<Product*> results;
+    for (int i = 0; i < sp.getSize(); i++) {
+        Product* p = sp[i]; if (!p) continue;
+        if (p->getColor() == key || p->getSize() == key) results.Push_back(p);
+    }
+
+    if (!results.Empty()) {
+        printHeader();
+        for (int i = 0; i < results.getSize(); ++i) cout << *results[i] << endl;
+    } else {
+        cout << "Product not found." << endl;
+    }
+
     return nullptr;
 }
 
@@ -190,6 +206,54 @@ void SearchProductByPriceRange(ProductDAO &productDAO) {
         for (int i = 0; i < results.getSize(); i++) {
             cout << *results[i] << endl;
         }
+    }
+}
+
+void SearchProductBySupplier(ProductDAO &productDAO) {
+    MyVector<Product*>& sp = productDAO.getDataCache();
+    MyVector<Product*> results;
+
+    string key;
+    cout << "Enter Supplier ID or Supplier Name: ";
+    getline(cin, key);
+    if (key.empty()) { cout << "Empty input.\n"; return; }
+
+    for (int i = 0; i < sp.getSize(); i++) {
+        Supplier* s = sp[i]->getSupplier();
+        if (!s) continue;
+        if (s->getSupID() == key || s->getSupName() == key) results.Push_back(sp[i]);
+    }
+
+    if (results.Empty()) {
+        cout << "No products found for supplier '" << key << "'." << endl;
+    } else {
+        cout << "Products for supplier '" << key << "':" << endl;
+        printHeader();
+        for (int i = 0; i < results.getSize(); i++) cout << *results[i] << endl;
+    }
+}
+
+void SearchProductByCategory(ProductDAO &productDAO) {
+    MyVector<Product*>& sp = productDAO.getDataCache();
+    MyVector<Product*> results;
+
+    string key;
+    cout << "Enter Category ID or Category Name: ";
+    getline(cin, key);
+    if (key.empty()) { cout << "Empty input.\n"; return; }
+
+    for (int i = 0; i < sp.getSize(); i++) {
+        Category* c = sp[i]->getCategory();
+        if (!c) continue;
+        if (c->getID_Category() == key || c->getName_Category() == key) results.Push_back(sp[i]);
+    }
+
+    if (results.Empty()) {
+        cout << "No products found for category '" << key << "'." << endl;
+    } else {
+        cout << "Products for category '" << key << "':" << endl;
+        printHeader();
+        for (int i = 0; i < results.getSize(); i++) cout << *results[i] << endl;
     }
 }
 

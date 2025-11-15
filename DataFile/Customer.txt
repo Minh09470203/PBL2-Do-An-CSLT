@@ -29,3 +29,4 @@ C028|Nguyen Anh Tuan|0788123456|Dong Nai|tuan.nguyen@example.com
 C029|Do Van Hien|0777123456|Long An|hien.do@example.com
 C030|Nguyen Thi Thu|0766123456|Binh Duong|thu.nguyen@example.com
 C031|thantoicao|999999999|thien dang|god@gmail.com
+C032|Nguyen Van A|0947122443|Da Nang|A@gmail.com

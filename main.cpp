@@ -134,18 +134,24 @@ void StaffMenu(CustomerDAO &customerDao, StaffDAO &staffDao,
                     else if (prodChoice == 3) ProductDelete(productDao);
                     else if (prodChoice == 4) {
                         int sChoice;
-                        cout << "1. Search by ID or Name\n";
+                        cout << "1. Search by ID/Name/Size/Color\n";
                         cout << "2. Search by range of Price\n";
+                        cout << "3. Search by Supplier\n";
+                        cout << "4. Search by Category\n";
                         cin >> sChoice; cin.ignore();
                         if (sChoice == 1) {
                             string keyword;
-                            cout << "Enter product ID or name: ";
+                            cout << "Enter product ID/Name/Size/Color: ";
                             getline(cin, keyword);
-                            Product* p = ProductSearchByIDName(productDao, keyword);
+                            Product* p = ProductSearchByKey(productDao, keyword);
                             if (p) { printHeader(); cout << *p << endl; }
                             else cout << "Product not found!\n";
                         } else if (sChoice == 2) {
                             SearchProductByPriceRange(productDao);
+                        } else if (sChoice == 3) {
+                            SearchProductBySupplier(productDao);
+                        } else if (sChoice == 4) {
+                            SearchProductByCategory(productDao);
                         } else {
                             cout << "Invalid choice!\n";
                         }
@@ -282,16 +288,18 @@ void CustomerMenu(ProductDAO &productDao,
                 break;
             case 2: {
                 int choice;
-                cout << "1. Search by ID or Name\n";
+                cout << "1. Search by ID/Name/Size/Color\n";
                 cout << "2. Search by range of Price\n";
+                cout << "3. Search by Supplier\n";
+                cout << "4. Search by Category\n";
                 cout << "Enter your choice: ";
                 cin >> choice;
                 cin.ignore();
                 if (choice == 1) {
                     string keyword;
-                    cout << "Enter product ID or name: ";
+                    cout << "Enter product ID/Name/Size/Color: ";
                     getline(cin, keyword);
-                    Product* p = ProductSearchByIDName(productDao, keyword);
+                    Product* p = ProductSearchByKey(productDao, keyword);
                     if (p) {
                     cout << "Product found:\n";
                     printHeader();
@@ -301,6 +309,10 @@ void CustomerMenu(ProductDAO &productDao,
                 }
                 } else if (choice == 2) {
                     SearchProductByPriceRange(productDao);
+                } else if (choice == 3) {
+                    SearchProductBySupplier(productDao);
+                } else if (choice == 4) {
+                    SearchProductByCategory(productDao);
                 } else {
                     cout << "Invalid choice!\n";
                 }

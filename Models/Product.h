@@ -19,7 +19,7 @@ private:
     string ID_SP;
     string Shoe_Name;
     string Color;
-    int Size;
+    string Size;
     int Price;
     int SLT;
     Supplier* sup;
@@ -29,7 +29,7 @@ public:
             string ID_SP = "",
             string Shoe_Name = "",
             string Color = "",
-            unsigned int Size = 0,
+            string Size = "",
             unsigned int Price = 0,
             unsigned int SLT = 0,
             Supplier* sup = nullptr,
@@ -45,7 +45,7 @@ public:
     string getIDsp();
     string getNamesp();
     string getColor();
-    int getSize();
+    string getSize();
     int getPrice();
     int getQuantity();
     Supplier *getSupplier();
@@ -67,7 +67,10 @@ void printProductList(ProductDAO &productDAO);
 void printHeader();
 bool isDuplicateProduct(ProductDAO &productDAO, const string& id = "", const string& name = "");
 void ProductInsert(ProductDAO &productDAO, SupplierDAO &supplierDAO, CategoryDAO &categoryDAO);
-Product* ProductSearchByIDName(ProductDAO &productDAO, string key);
+Product* ProductSearchByKey(ProductDAO &productDAO, string key);
+bool ProductSearchPrintedResults();
 void SearchProductByPriceRange(ProductDAO &productDAO);
+void SearchProductBySupplier(ProductDAO &productDAO);
+void SearchProductByCategory(ProductDAO &productDAO);
 void ProductDelete(ProductDAO &productDAO);
 #endif // PRODUCT_H_INCLUDED
