@@ -47,7 +47,7 @@ public:
     string getColor();
     string getSize();
     int getPrice();
-    int getQuantity();
+    int getSLT();
     Supplier *getSupplier();
     Category *getCategory();
     void setSLT(int newQuantity);

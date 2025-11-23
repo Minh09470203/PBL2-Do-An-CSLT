@@ -318,7 +318,7 @@ void StatsService::printLowStock(int threshold) {
 
     for (int i = 0; i < prods.getSize(); ++i) {
         Product* p = prods[i];
-        int qty = p->getQuantity();
+        int qty = p->getSLT();
         if (qty <= threshold) {
             string status;
             string color;

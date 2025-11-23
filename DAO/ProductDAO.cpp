@@ -12,7 +12,7 @@ bool ProductDAO::create(const string &id, Product* entity) {
          << entity->getColor() << "|"
          << entity->getSize() << "|"
          << entity->getPrice() << "|"
-         << entity->getQuantity() << "|"
+         << entity->getSLT() << "|"
          << (entity->getSupplier() ? entity->getSupplier()->getSupID() : string("")) << "|"
          << (entity->getCategory() ? entity->getCategory()->getID_Category() : string("")) << "\n";
     file.close();
@@ -112,7 +112,7 @@ bool ProductDAO::saveData() {
              << dataCache[i]->getColor() << "|"
              << dataCache[i]->getSize() << "|"
              << dataCache[i]->getPrice() << "|"
-             << dataCache[i]->getQuantity() << "|"
+             << dataCache[i]->getSLT() << "|"
              << (dataCache[i]->getSupplier() ? dataCache[i]->getSupplier()->getSupID() : string("")) << "|"
              << (dataCache[i]->getCategory() ? dataCache[i]->getCategory()->getID_Category() : string("")) << "\n";
     }

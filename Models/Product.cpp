@@ -45,7 +45,7 @@ string Product::getNamesp() { return Shoe_Name; }
 string Product::getColor() { return Color; }
 string Product::getSize() { return Size; }
 int Product::getPrice() { return Price; }
-int Product::getQuantity() { return SLT; }
+int Product::getSLT() { return SLT; }
 Supplier *Product::getSupplier() { return sup; }
 Category *Product::getCategory() { return cate; }
 void Product::setSLT(int newQuantity) { this->SLT = newQuantity; }

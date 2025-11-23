@@ -103,7 +103,7 @@ void ProcessOrderRequests(OrderDAO &orderDao, Staff *currentStaff) {
     }
 }
 
-// Free helper: advance order status through the sequence Pending -> Confirmed -> Packing -> Shipping -> Completed
+// Free helper: advance order status through the sequence Pending -> Confirmed -> Packing -> Shipping -> Delivered
 void HandleOrderStatusUpdate(OrderDAO &orderDao) {
     string ordID;
     cout << "Enter order ID to update status: ";
@@ -117,13 +117,13 @@ void HandleOrderStatusUpdate(OrderDAO &orderDao) {
     string next;
     if (curr == "Confirmed") next = "Packing";
     else if (curr == "Packing") next = "Shipping";
-    else if (curr == "Shipping") next = "Completed";
+    else if (curr == "Shipping") next = "Delivered";
     else if (curr == "Pending") next = "Confirmed"; // allow staff/manager to confirm pending
-    else if (curr == "Completed") next = "";
+    else if (curr == "Delivered") next = "";
     else next = "Confirmed";
 
     if (next.empty()) {
-        cout << "Order is already Completed. No further updates possible.\n";
+        cout << "Order is already Delivered. No further updates possible.\n";
         return;
     }
 
@@ -201,15 +201,15 @@ void CreateOrder(OrderDAO &orderDAO, CustomerDAO &customerDAO, ProductDAO &produ
         cin >> qty;
         cin.ignore();
 
-        if (qty <= 0 || qty > prod->getQuantity()) {
-            cout << "  Invalid quantity (available: " << prod->getQuantity() << "). Please re-enter this item." << endl;
+        if (qty <= 0 || qty > prod->getSLT()) {
+            cout << "  Invalid quantity (available: " << prod->getSLT() << "). Please re-enter this item." << endl;
             --i;
             continue;
         }
 
     OrderDetail* od = new OrderDetail(prod, qty, prod->getPrice());
     ord->addDetail(od);
-        prod->setSLT(prod->getQuantity() - qty);
+        prod->setSLT(prod->getSLT() - qty);
     }
 
     ord->calculateTotal();
