@@ -15,6 +15,7 @@ Data is stored and loaded from text files in the `DataFile/` directory.
 - Product management: view, add, delete, search
 - Category / Supplier management: view, add
 - Invoice management: view, create invoices, view invoice details
+- Statistics: basic sales statistics including revenue summaries (daily/monthly), top-selling products and other simple reports
 - In-memory runtime storage using MyVector and lookup using MyMap
 - All data persists in text files (loaded on startup; saved when changes occur)
 
