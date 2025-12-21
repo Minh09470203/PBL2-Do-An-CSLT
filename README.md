@@ -44,8 +44,7 @@ Requirements: C++ compiler (g++ 7+), make (optional).
 Build (from repo root):
 - Quick way (compile all `.cpp` files in the repo):
   ```
-  g++ -o main main.cpp Models/Person.cpp Models/Customer.cpp Models/Staff.cpp Models/Product.cpp Models/Category.cpp Models/Supplier.cpp Models/Invoice.cpp Models/OrderDetail.cpp
-  Models/Account.cpp AppSession/SessionManager.cpp DAO/IDAO.cpp DAO/AccountDAO.cpp DAO/CustomerDAO.cpp DAO/StaffDAO.cpp DAO/ProductDAO.cpp DAO/CategoryDAO.cpp DAO/SupplierDAO.cpp DAO/InvoiceDAO.cpp
+  g++ -std=c++17 -o main.exe main.cpp Models/*.cpp DAO/*.cpp AppSession/*.cpp
   ```
 
 - After building:
