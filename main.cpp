@@ -359,7 +359,7 @@ void CustomerMenu(ProductDAO &productDao,
                                 OrderDetail* od = toCancel->getDetails()[k];
                                 Product* prod = od->getProduct();
                                 if (prod) {
-                                    prod->setSLT(prod->getQuantity() + od->getQuantity());
+                                    prod->setSLT(prod->getSLT() + od->getQuantity());
                                 }
                             }
                             // persist product changes
