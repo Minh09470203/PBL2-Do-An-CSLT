@@ -223,6 +223,65 @@ void CreateOrder(OrderDAO &orderDAO, CustomerDAO &customerDAO, ProductDAO &produ
     }
 }
 
+void ViewOrder(OrderDAO &orderDao, ProductDAO &productDao) {
+    SessionManager& session = SessionManager::getInstance(); 
+    cout << "\n--- Your orders ---\n";
+                bool found = false;
+                MyVector<Order*>& allInv = orderDao.getDataCache();
+                MyVector<Order*> pending; // pending for this customer
+                for (int i = 0; i < allInv.getSize(); i++) {
+                    Order* ord = allInv[i];
+                    if (ord->getCustomer() && ord->getCustomer()->getID() == session.getCurrentCustomer()->getID()) {
+                        cout << "Order: " << ord->getIDhd()
+                             << " | Date: " << ord->getDate()
+                             << " | Status: " << ord->getStatus()
+                             << " | Total: " << ord->getTotalAmount() << " VND" << endl;
+                        found = true;
+                        if (ord->getStatus() == "Pending" || ord->getIDhd() == string("Waiting for confirmation")) {
+                            pending.Push_back(ord);
+                        }
+                    }
+                }
+                if (!found) {
+                    cout << "No orders found.\n";
+                    return;
+                }
+
+                // Allow cancellation of pending orders
+                    if (!pending.Empty()) {
+                    cout << "\nYou have " << pending.getSize() << " pending order(s) that can be cancelled before confirmation." << endl;
+                    for (int i = 0; i < pending.getSize(); ++i) {
+                        Order* p = pending[i];
+                        cout << "[" << i+1 << "] " << "Date: " << p->getDate() << " | Total: " << p->getTotalAmount() << " VND" << endl;
+                    }
+                    cout << "Enter pending index to cancel (0 to skip): ";
+                    int pick = 0; cin >> pick; cin.ignore();
+                    if (pick > 0 && pick <= pending.getSize()) {
+                        Order* toCancel = pending[pick-1];
+                        cout << "Are you sure you want to cancel this order? (y/n): "; char c; cin >> c; cin.ignore();
+                        if (c == 'y' || c == 'Y') {
+                            // restore product quantities
+                            for (int k = 0; k < toCancel->getDetails().getSize(); ++k) {
+                                OrderDetail* od = toCancel->getDetails()[k];
+                                Product* prod = od->getProduct();
+                                if (prod) {
+                                    prod->setSLT(prod->getSLT() + od->getQuantity());
+                                }
+                            }
+                            // persist product changes
+                            productDao.saveData();
+                            // remove order
+                            if (orderDao.removeByPointer(toCancel)) {
+                                cout << "Order cancelled and removed successfully." << endl;
+                            } else {
+                                cout << "Failed to remove order." << endl;
+                            }
+                        } else {
+                            cout << "Cancellation aborted." << endl;
+                        }
+                    }
+                }
+}
 void printOrderList(OrderDAO &orderDAO) {
     MyVector<Order*>& orders = orderDAO.getDataCache();
     cout << left << setw(15) << "Order ID"

@@ -65,7 +65,7 @@ void CreateOrder(OrderDAO &orderDAO, CustomerDAO &customerDAO, ProductDAO &produ
 // Free helper functions (moved out of class)
 void ProcessOrderRequests(OrderDAO &orderDao, Staff *currentStaff);
 void HandleOrderStatusUpdate(OrderDAO &orderDao);
-
+void ViewOrder(OrderDAO &orderDao, ProductDAO &productDAO);
 void printOrderList(OrderDAO &orderDAO);
 
 #endif // ORDER_H_INCLUDED
