@@ -46,8 +46,8 @@ void ChangePassword(AccountDAO &accountDAO) {
     }
 
     Account* account = accountDAO.read(currentUsername);
-    if (account && account->password == oldPassword) {
-        account->password = newPassword;  
+    if (account && account->getPassword() == oldPassword) {
+        account->setPassword(newPassword);  
         accountDAO.update(currentUsername, account); 
         cout << "Password changed successfully!\n";
     } else {
@@ -66,12 +66,12 @@ int Login(CustomerDAO &customerDAO, StaffDAO &staffDAO, AccountDAO &accountDAO) 
 
     Account* account = accountDAO.read(username);
     
-    if (account && account->password == password) {
+    if (account && account->getPassword() == password) {
         session.setCurrentUsername(username);
         
-        if (account->userType == "staff") {
+        if (account->getUserType() == "staff") {
             // Find staff
-            Staff* staff = staffDAO.read(account->userID);
+            Staff* staff = staffDAO.read(account->getUserID());
             if (staff) {
                 session.setCurrentStaff(staff);
                 cout << "Staff login successful! Welcome " << session.getCurrentStaff()->getNamenv() << "\n";
@@ -81,9 +81,9 @@ int Login(CustomerDAO &customerDAO, StaffDAO &staffDAO, AccountDAO &accountDAO) 
                 return 0;
             }
         }
-        else if (account->userType == "customer") {
+        else if (account->getUserType() == "customer") {
             // Find customer
-            Customer* customer = customerDAO.read(account->userID);
+            Customer* customer = customerDAO.read(account->getUserID());
             if (customer) {
                 session.setCurrentCustomer(customer);
                 cout << "Customer login successful! Welcome " << session.getCurrentCustomer()->getName() << "\n";
@@ -163,10 +163,10 @@ void Register(CustomerDAO &customerDAO, AccountDAO &accountDAO) {
     }
 
     Account* acc = new Account();
-    acc->username = username;
-    acc->password = password;
-    acc->userType = "customer";
-    acc->userID = custID;
+    acc->setUsername(username);
+    acc->setPassword(password);
+    acc->setUserType("customer");
+    acc->setUserID(custID);
     if (!accountDAO.create(username, acc)) {
         cout << "Failed to create account. Rolling back customer record.\n";
         customerDAO.remove(custID);

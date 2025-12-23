@@ -13,14 +13,14 @@ bool AccountDAO::create(const string &id, Account* entity) {
         cout << "Cannot open " << filename << endl;
         return false;
     }
-    file << entity->username << "|" << entity->password << "|" << entity->userType << "|" << entity->userID << "\n";
+    file << entity->getUsername() << "|" << entity->getPassword() << "|" << entity->getUserType() << "|" << entity->getUserID() << "\n";
     file.close();
     return true;
 }
 
 Account* AccountDAO::read(const string &id) {
     for (int i = 0; i < dataCache.getSize(); ++i) {
-        if (dataCache[i]->username == id || dataCache[i]->userID == id) return dataCache[i];
+        if (dataCache[i]->getUsername() == id || dataCache[i]->getUserID() == id) return dataCache[i];
     }
     return nullptr;
 }
@@ -31,7 +31,7 @@ bool AccountDAO::update(const string &id, Account* entity) {
 
 bool AccountDAO::remove(const string &id) {
     for (int i = 0; i < dataCache.getSize(); ++i) {
-        if (dataCache[i]->username == id) {
+        if (dataCache[i]->getUsername() == id) {
             delete dataCache[i];
             for (int j = i; j < dataCache.getSize() - 1; ++j) dataCache[j] = dataCache[j+1];
             dataCache.Pop_back();
@@ -57,10 +57,10 @@ bool AccountDAO::loadData() {
         getline(ss, userID);
 
         Account *acc = new Account();
-        acc->username = username;
-        acc->password = password;
-        acc->userType = userType;
-        acc->userID = userID;
+        acc->setUsername(username);
+        acc->setPassword(password);
+        acc->setUserType(userType);
+        acc->setUserID(userID);
         dataCache.Push_back(acc);
     }
     file.close();
@@ -73,7 +73,7 @@ bool AccountDAO::saveData() {
         return false;
     }
     for (int i = 0; i < dataCache.getSize(); ++i) {
-        file << dataCache[i]->username << "|" << dataCache[i]->password << "|" << dataCache[i]->userType << "|" << dataCache[i]->userID << "\n";
+        file << dataCache[i]->getUsername() << "|" << dataCache[i]->getPassword() << "|" << dataCache[i]->getUserType() << "|" << dataCache[i]->getUserID() << "\n";
     }
     file.close();
     return true;

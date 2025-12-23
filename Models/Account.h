@@ -9,11 +9,25 @@
 #include "Staff.h"
 using namespace std;
 class Account {
-public:
+private:
     string username;
     string password;
     string userType; // "staff", "customer"
     string userID;   // ID user
+
+public:
+    // Getters
+    string getUsername() const { return username; }
+    string getPassword() const { return password; }
+    string getUserType() const { return userType; }
+    string getUserID() const { return userID; }
+
+    // Setters
+    void setUsername(const string& u) { this->username = u; }
+    void setPassword(const string& p) { this->password = p; }
+    void setUserType(const string& t) { this->userType = t; }
+    void setUserID(const string& id) { this->userID = id; }
+
     // Stream I/O
     ostream& output(ostream& os) const;
     friend ostream& operator<<(ostream& os, const Account& a);
